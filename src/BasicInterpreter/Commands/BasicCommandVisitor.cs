@@ -96,6 +96,28 @@ namespace JesseFreeman.BasicInterpreter.Commands
             return new EndCommand(interpreter);
         }
 
+        public override ICommand VisitGotostmt(BasicParser.GotostmtContext context)
+        {
+            // Parse the line number from the GOTO statement
+            int targetLineNumber = int.Parse(context.linenumber().GetText());
+
+            // Create a new GotoCommand with the target line number
+            return new GotoCommand(targetLineNumber);
+        }
+
+        //public override ICommand VisitGosubstmt(BasicParser.GosubstmtContext context)
+        //{
+        //    int targetLineNumber = int.Parse(context.number().GetText());
+        //    return new GosubCommand(targetLineNumber);
+        //}
+
+        //public override ICommand VisitReturnstmt(BasicParser.ReturnstmtContext context)
+        //{
+        //    return new ReturnCommand();
+        //}
+
+
+
 
 
     }

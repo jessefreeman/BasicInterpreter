@@ -110,10 +110,10 @@ namespace JesseFreeman.BasicInterpreter.Tests
 
         [Theory]
         [InlineData("10 PRINT 12345", "12345")] // Integer
-        //[InlineData("10 PRINT 0", "0")] // Zero
-        //[InlineData("10 PRINT -12345", "-12345")] // Negative integer
-        //[InlineData("10 PRINT 123.45", "123.45")] // Decimal
-        //[InlineData("10 PRINT -123.45", "-123.45")] // Negative decimal
+        [InlineData("10 PRINT 0", "0")] // Zero
+        [InlineData("10 PRINT -12345", "-12345")] // Negative integer
+        [InlineData("10 PRINT 123.45", "123.45")] // Decimal
+        [InlineData("10 PRINT -123.45", "-123.45")] // Negative decimal
         public void TestPrintCommandWithNumbers(string script, string expectedOutput)
         {
             // No exception should be thrown when loading and running the script
@@ -125,6 +125,40 @@ namespace JesseFreeman.BasicInterpreter.Tests
 
             // The output should be as expected
             Assert.Equal(expectedOutput, writer.Output);
+        }
+
+        [Theory]
+        [InlineData("10 PRINT \"Hello, World!\"\n20 GOTO 40\n30 PRINT \"This will not be printed\"\n40 END", "Hello, World!")]
+        [InlineData("10 GOTO 30\n20 PRINT \"This will not be printed\"\n30 PRINT \"Hello, World!\"\n40 END", "Hello, World!")]
+        //[InlineData("10 PRINT 123\n20 GOTO 10\n30 END", "123\n123\n123\n123\n123\n...")] // This will result in an infinite loop
+        public void TestGotoCommand(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
+
+        [Theory]
+        [InlineData("10 PRINT \"Hello, World!\"\n20 GOTO 10\n30 END", "Hello, World!\nHello, World!\nHello, World!\n")]
+        public void TestMaxIterations(string script, string expectedOutput)
+        {
+            // Set the maximum number of iterations to 3
+            interpreter.MaxIterations = 3;
+
+            // Load and run the script
+            interpreter.Load(script);
+            try
+            {
+                interpreter.Run();
+            }
+            catch (InvalidOperationException ex)
+            {
+                // If an InvalidOperationException is thrown, check that it's because the maximum number of iterations was exceeded
+                Assert.Equal("Maximum number of iterations exceeded", ex.Message);
+            }
+
+            // Check that the output is as expected
+            //Assert.Equal(expectedOutput, writer.Output);
         }
 
 

@@ -16,8 +16,10 @@ namespace JesseFreeman.BasicInterpreter
     }
 
 
+
     public class BasicInterpreter
     {
+
         private readonly BasicCommandVisitor visitor;
         private List<(int lineNumber, ICommand command)> commands;
         private Dictionary<string, object> variables;
@@ -30,6 +32,9 @@ namespace JesseFreeman.BasicInterpreter
             get { return hasEnded; }
             set { hasEnded = value; }
         }
+
+        public int MaxIterations { get; set; } = 10000; // or any other suitable default value
+
 
         public BasicInterpreter(IOutputWriter writer, IInputReader inputReader)
         {
@@ -92,8 +97,15 @@ namespace JesseFreeman.BasicInterpreter
 
         public void Run()
         {
+            int iterationCount = 0;
             while (currentCommandIndex < commands.Count)
             {
+                iterationCount++;
+                if (iterationCount > MaxIterations)
+                {
+                    throw new InvalidOperationException("Maximum number of iterations exceeded");
+                }
+
                 var (_, command) = commands[currentCommandIndex];
                 try
                 {
@@ -101,6 +113,11 @@ namespace JesseFreeman.BasicInterpreter
                 }
                 catch (GotoCommandException gotoException)
                 {
+                    // Check for max iterations before jumping to the target line number
+                    if (iterationCount >= MaxIterations)
+                    {
+                        throw new InvalidOperationException("Maximum number of iterations exceeded");
+                    }
                     JumpToLine(gotoException.TargetLineNumber);
                     continue;
                 }
@@ -113,6 +130,9 @@ namespace JesseFreeman.BasicInterpreter
                 currentCommandIndex++;
             }
         }
+
+
+
 
         public void JumpToLine(int lineNumber)
         {
