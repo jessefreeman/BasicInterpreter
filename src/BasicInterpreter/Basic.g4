@@ -15,6 +15,10 @@ prog
    ;
 
 // a line starts with an INT
+// line
+//   : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
+//   ;
+
 line
    : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
    ;
@@ -1100,6 +1104,11 @@ CLS
 COMMENT
    : REM ~ [\r\n]*
    ;
+
+// Define a new lexer rule for comments
+// comment
+//   : REM ~[\r\n]*
+//   ;
 
 
 STRINGLITERAL

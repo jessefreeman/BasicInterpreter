@@ -15,7 +15,7 @@ namespace JesseFreeman.BasicInterpreter.Commands
 
         public void Execute()
         {
-            writer.Write(text);
+            writer.WriteLine(text);
         }
     }
 

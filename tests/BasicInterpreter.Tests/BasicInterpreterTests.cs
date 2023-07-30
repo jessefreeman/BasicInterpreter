@@ -61,7 +61,7 @@ namespace JesseFreeman.BasicInterpreter.Tests
         //}
 
         [Theory]
-        [InlineData("10 PRINT \"Hello, World!\"", "Hello, World!")]
+        [InlineData("10 PRINT \"Hello, World!\"", "Hello, World!\n")]
         public void TestCorrectOutput(string script, string expectedOutput)
         {
             interpreter.Load(script);
@@ -70,9 +70,9 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
-        [InlineData("10 END", "")] // Script with only an END statement, no output
-        [InlineData("10 PRINT \"Hello\"\n20 END", "Hello")] // Script with a PRINT statement before the END, should print "Hello"
-        [InlineData("10 PRINT \"Hello\"\n20 END\n30 PRINT \"World\"", "Hello")] // Script with a PRINT statement after the END, should only print "Hello"
+        [InlineData("10 END", "")]
+        [InlineData("10 PRINT \"Hello\"\n20 END", "Hello\n")]
+        [InlineData("10 PRINT \"Hello\"\n20 END\n30 PRINT \"World\"", "Hello\n")]
         public void TestEndCommand(string script, string expectedOutput)
         {
             // No exception should be thrown when loading and running the script
@@ -90,10 +90,10 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
-        [InlineData("10 PRINT \"Hello, World!\"", "Hello, World!")] // Basic string
-        [InlineData("10 PRINT \"\"", "")] // Empty string
-        [InlineData("10 PRINT \"12345\"", "12345")] // Numeric string
-        [InlineData("10 PRINT \"Special characters: !@#$%^&*()\"", "Special characters: !@#$%^&*()")] // String with special characters
+        [InlineData("10 PRINT \"Hello, World!\"", "Hello, World!\n")]
+        [InlineData("10 PRINT \"\"", "\n")]
+        [InlineData("10 PRINT \"12345\"", "12345\n")]
+        [InlineData("10 PRINT \"Special characters: !@#$%^&*()\"", "Special characters: !@#$%^&*()\n")]
         //[InlineData("10 PRINT \"Multiple\nLines\"", "Multiple\nLines")] // Multiline string
         public void TestPrintCommand(string script, string expectedOutput)
         {
@@ -109,11 +109,11 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
-        [InlineData("10 PRINT 12345", "12345")] // Integer
-        [InlineData("10 PRINT 0", "0")] // Zero
-        [InlineData("10 PRINT -12345", "-12345")] // Negative integer
-        [InlineData("10 PRINT 123.45", "123.45")] // Decimal
-        [InlineData("10 PRINT -123.45", "-123.45")] // Negative decimal
+        [InlineData("10 PRINT 12345", "12345\n")]
+        [InlineData("10 PRINT 0", "0\n")]
+        [InlineData("10 PRINT -12345", "-12345\n")]
+        [InlineData("10 PRINT 123.45", "123.45\n")]
+        [InlineData("10 PRINT -123.45", "-123.45\n")]
         public void TestPrintCommandWithNumbers(string script, string expectedOutput)
         {
             // No exception should be thrown when loading and running the script
@@ -128,8 +128,8 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
-        [InlineData("10 PRINT \"Hello, World!\"\n20 GOTO 40\n30 PRINT \"This will not be printed\"\n40 END", "Hello, World!")]
-        [InlineData("10 GOTO 30\n20 PRINT \"This will not be printed\"\n30 PRINT \"Hello, World!\"\n40 END", "Hello, World!")]
+        [InlineData("10 PRINT \"Hello, World!\"\n20 GOTO 40\n30 PRINT \"This will not be printed\"\n40 END", "Hello, World!\n")]
+        [InlineData("10 GOTO 30\n20 PRINT \"This will not be printed\"\n30 PRINT \"Hello, World!\"\n40 END", "Hello, World!\n")]
         //[InlineData("10 PRINT 123\n20 GOTO 10\n30 END", "123\n123\n123\n123\n123\n...")] // This will result in an infinite loop
         public void TestGotoCommand(string script, string expectedOutput)
         {
@@ -160,6 +160,18 @@ namespace JesseFreeman.BasicInterpreter.Tests
             // Check that the output is as expected
             //Assert.Equal(expectedOutput, writer.Output);
         }
+
+        [Theory]
+        [InlineData("10 REM This is a comment\n20 PRINT \"Hello, World!\"", "Hello, World!\n")]
+        [InlineData("20 PRINT \"Hello, World!\"\n30 REM THIS IS A COMMENT", "Hello, World!\n")]
+        [InlineData("10 PRINT \"Hello, World!\" REM This is a comment", "Hello, World!\n")]
+        public void TestComments(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
+
 
 
 

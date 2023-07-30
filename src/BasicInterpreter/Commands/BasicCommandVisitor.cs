@@ -37,6 +37,15 @@ namespace JesseFreeman.BasicInterpreter.Commands
         {
             // Process each statement on the line
             var commands = new List<ICommand>();
+
+            // Check if context corresponds to a comment
+            if (context.COMMENT() != null || context.REM() != null)
+            {
+                // This line is a comment, so we can return a 'no operation' command or null
+                // Here's an example of returning null
+                return null;
+            }
+
             foreach (var amprstmt in context.amprstmt())
             {
                 var statement = amprstmt.statement();

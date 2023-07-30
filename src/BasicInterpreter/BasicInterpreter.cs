@@ -54,10 +54,10 @@ namespace JesseFreeman.BasicInterpreter
             var parser = new BasicParser(commonTokenStream);
 
             // Set the custom error strategy
-            //parser.ErrorHandler = new ThrowingErrorStrategy();
+            parser.ErrorHandler = new ThrowingErrorStrategy();
 
-            parser.RemoveErrorListeners(); // remove default error listeners
-            parser.AddErrorListener(new ThrowingErrorListener()); // add your custom error listener
+            //parser.RemoveErrorListeners(); // remove default error listeners
+            //parser.AddErrorListener(new ThrowingErrorListener()); // add your custom error listener
 
 
             try

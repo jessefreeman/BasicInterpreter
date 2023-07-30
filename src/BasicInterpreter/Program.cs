@@ -10,7 +10,7 @@ class Program
         var interpreter = new BasicInterpreter(writer, reader);
         //interpreter.MaxIterations = 3;
 
-        var code = "10 PRINT \"Hello, World!\"\n20 GOTO 10\n30 END";
+        var code = "10 REM This is a comment\n20 PRINT \"Hello, World!\"\n";
 
         interpreter.Load(code);
 
