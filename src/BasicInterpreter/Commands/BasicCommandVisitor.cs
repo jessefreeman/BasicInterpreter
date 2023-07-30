@@ -1,4 +1,5 @@
 ﻿using JesseFreeman.BasicInterpreter.AntlrGenerated;
+using JesseFreeman.BasicInterpreter.Exceptions;
 using JesseFreeman.BasicInterpreter.IO;
 
 namespace JesseFreeman.BasicInterpreter.Commands
@@ -42,6 +43,10 @@ namespace JesseFreeman.BasicInterpreter.Commands
                 if (statement != null)
                 {
                     var command = Visit(statement);
+                    if (command == null)
+                    {
+                        throw new InvalidOperationException("Visit method returned null for a statement");
+                    }
                     commands.Add(command);
                 }
             }
@@ -50,7 +55,48 @@ namespace JesseFreeman.BasicInterpreter.Commands
             return new CompositeCommand(commands);
         }
 
+
         // Add methods to visit other types of nodes in the parse tree
         // based on the new grammar rules
+        public override ICommand VisitPrintstmt1(BasicParser.Printstmt1Context context)
+        {
+            // Check if there's an expression within the PRINT statement
+            if (context.expression() != null)
+            {
+                var expressionContext = context.expression();
+
+                // Check if the expression is a string literal
+                if (expressionContext.func_() != null && expressionContext.func_().STRINGLITERAL() != null)
+                {
+                    string text = expressionContext.func_().STRINGLITERAL().GetText();
+                    // Remove the surrounding quotes from the string literal
+                    text = text.Substring(1, text.Length - 2);
+                    return new PrintCommand(text, writer);
+                }
+                // Check if the expression is a numeric literal
+                else if (expressionContext.func_() != null && expressionContext.func_().number() != null)
+                {
+                    string text = expressionContext.func_().number().GetText();
+                    return new PrintCommand(text, writer);
+                }
+                else
+                {
+                    throw new NotImplementedException("Only static strings and numbers are currently supported in PRINT statements");
+                }
+            }
+            else
+            {
+                throw new ParsingException("PRINT statement must contain an expression");
+            }
+        }
+
+
+        public override ICommand VisitEndstmt(BasicParser.EndstmtContext context)
+        {
+            return new EndCommand(interpreter);
+        }
+
+
+
     }
 }

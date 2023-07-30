@@ -9,7 +9,7 @@ class Program
         var reader = new ConsoleInputReader();
         var interpreter = new BasicInterpreter(writer, reader);
 
-        var code = "10 PRIN \"Hello, World!\"";
+        var code = "10 PRIN =\"Hello, World!\"";
 
         interpreter.Load(code);
         interpreter.Run();

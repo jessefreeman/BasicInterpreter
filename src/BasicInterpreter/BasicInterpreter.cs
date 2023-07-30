@@ -6,6 +6,16 @@ using JesseFreeman.BasicInterpreter.IO;
 
 namespace JesseFreeman.BasicInterpreter
 {
+    public class ThrowingErrorListener : BaseErrorListener
+    {
+        public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
+        {
+            string errorMessage = $"Line {line}:{charPositionInLine} - {msg}";
+            throw new ParsingException(errorMessage, e);
+        }
+    }
+
+
     public class BasicInterpreter
     {
         private readonly BasicCommandVisitor visitor;
@@ -39,7 +49,11 @@ namespace JesseFreeman.BasicInterpreter
             var parser = new BasicParser(commonTokenStream);
 
             // Set the custom error strategy
-            parser.ErrorHandler = new ThrowingErrorStrategy();
+            //parser.ErrorHandler = new ThrowingErrorStrategy();
+
+            parser.RemoveErrorListeners(); // remove default error listeners
+            parser.AddErrorListener(new ThrowingErrorListener()); // add your custom error listener
+
 
             try
             {
