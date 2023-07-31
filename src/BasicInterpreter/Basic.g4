@@ -1105,11 +1105,6 @@ COMMENT
    : REM ~ [\r\n]*
    ;
 
-// Define a new lexer rule for comments
-// comment
-//   : REM ~[\r\n]*
-//   ;
-
 
 STRINGLITERAL
    : '"' ~ ["\r\n]* '"'

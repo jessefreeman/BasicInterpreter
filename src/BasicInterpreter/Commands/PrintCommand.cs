@@ -1,23 +1,38 @@
-﻿using JesseFreeman.BasicInterpreter.IO;
+﻿using JesseFreeman.BasicInterpreter.Exceptions;
+using JesseFreeman.BasicInterpreter.IO;
+using System;
 
 namespace JesseFreeman.BasicInterpreter.Commands
 {
     public class PrintCommand : ICommand
     {
-        private string text;
+        private string variableName;
+        private Dictionary<string, object> variables;
         private IOutputWriter writer;
+        private string literalValue;
 
-        public PrintCommand(string text, IOutputWriter writer)
+        public PrintCommand(string variableName, Dictionary<string, object> variables, IOutputWriter writer, string literalValue = null)
         {
-            this.text = text;
+            this.variableName = variableName;
+            this.variables = variables;
             this.writer = writer;
+            this.literalValue = literalValue;
         }
 
         public void Execute()
         {
-            writer.WriteLine(text);
+            if (literalValue != null)
+            {
+                writer.WriteLine(literalValue);
+            }
+            else if (variables.ContainsKey(variableName))
+            {
+                writer.WriteLine(variables[variableName].ToString());
+            }
+            else
+            {
+                throw new VariableNotDefinedException(variableName);
+            }
         }
     }
-
 }
-

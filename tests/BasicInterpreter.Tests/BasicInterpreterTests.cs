@@ -52,13 +52,16 @@ namespace JesseFreeman.BasicInterpreter.Tests
         //    Assert.IsAssignableFrom<ParsingException>(exception); // Ensure a ParsingException is thrown for invalid syntax
         //}
 
-        //[Theory]
-        //[InlineData("10 PRINT x")] // x is not defined
-        //public void TestUndefinedVariableScript(string script)
-        //{
-        //    var exception = Record.Exception(() => interpreter.Load(script));
-        //    Assert.IsAssignableFrom<UndefinedVariableException>(exception); // Ensure an UndefinedVariableException is thrown for undefined variables
-        //}
+        [Theory]
+        [InlineData("10 PRINT x")] // x is not defined
+        public void TestUndefinedVariableScript(string script)
+        {
+            interpreter.Load(script);
+            var exception = Record.Exception(() => interpreter.Run());
+            Assert.IsAssignableFrom<VariableNotDefinedException>(exception); // Ensure a VariableNotDefinedException is thrown for undefined variables
+        }
+
+
 
         [Theory]
         [InlineData("10 PRINT \"Hello, World!\"", "Hello, World!\n")]
@@ -130,10 +133,10 @@ namespace JesseFreeman.BasicInterpreter.Tests
         [Theory]
         [InlineData("10 PRINT \"Hello, World!\"\n20 GOTO 40\n30 PRINT \"This will not be printed\"\n40 END", "Hello, World!\n")]
         [InlineData("10 GOTO 30\n20 PRINT \"This will not be printed\"\n30 PRINT \"Hello, World!\"\n40 END", "Hello, World!\n")]
-        //[InlineData("10 PRINT 123\n20 GOTO 10\n30 END", "123\n123\n123\n123\n123\n...")] // This will result in an infinite loop
         public void TestGotoCommand(string script, string expectedOutput)
         {
             interpreter.Load(script);
+            interpreter.MaxIterations = 3;
             interpreter.Run();
             Assert.Equal(expectedOutput, writer.Output);
         }
@@ -170,6 +173,36 @@ namespace JesseFreeman.BasicInterpreter.Tests
             interpreter.Load(script);
             interpreter.Run();
             Assert.Equal(expectedOutput, writer.Output);
+        }
+
+        [Theory]
+        [InlineData("10 LET A$ = \"Hello, World!\"\n20 PRINT A$", "Hello, World!\n")]
+        [InlineData("10 LET A = 123\n20 PRINT A", "123\n")]
+        [InlineData("10 LET A$ = \"Hello, World!\"\n20 PRINT A$\n30 LET A$ = \"Goodbye, World!\"\n40 PRINT A$", "Hello, World!\nGoodbye, World!\n")]
+        [InlineData("10 LET A = 123\n20 PRINT A\n30 LET A = 456\n40 PRINT A", "123\n456\n")]
+        public void TestLetCommand(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
+
+        [Theory]
+        [InlineData("10 PRINT A$", "VariableNotDefinedException")] // Test undefined variable
+        [InlineData("10 LET A$ = 123\n20 PRINT A$", "InvalidTypeAssignmentException")] // Test setting a number to a string variable        //[InlineData("10 LET A = \"Hello\"\n20 PRINT A", "TypeMismatchException")] // Test setting a string to a number variable
+        [InlineData("10 LET A$ = \"Hello\"\n20 PRINT A$\n30 LET A$ = 123\n40 PRINT A$", "InvalidTypeAssignmentException")] // Test resetting a string variable to a number
+        [InlineData("10 LET A = 123\n20 PRINT A\n30 LET A = \"Hello\"\n40 PRINT A", "InvalidTypeAssignmentException")] // Test resetting a number variable to a string
+        public void TestLetCommandExceptions(string script, string expectedException)
+        {
+            try
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            }
+            catch (Exception ex)
+            {
+                Assert.Equal(expectedException, ex.GetType().Name);
+            }
         }
 
 

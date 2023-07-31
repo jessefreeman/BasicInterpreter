@@ -65,8 +65,6 @@ namespace JesseFreeman.BasicInterpreter.Commands
         }
 
 
-        // Add methods to visit other types of nodes in the parse tree
-        // based on the new grammar rules
         public override ICommand VisitPrintstmt1(BasicParser.Printstmt1Context context)
         {
             // Check if there's an expression within the PRINT statement
@@ -80,17 +78,32 @@ namespace JesseFreeman.BasicInterpreter.Commands
                     string text = expressionContext.func_().STRINGLITERAL().GetText();
                     // Remove the surrounding quotes from the string literal
                     text = text.Substring(1, text.Length - 2);
-                    return new PrintCommand(text, writer);
+                    return new PrintCommand(null, null, writer, text);
                 }
                 // Check if the expression is a numeric literal
                 else if (expressionContext.func_() != null && expressionContext.func_().number() != null)
                 {
                     string text = expressionContext.func_().number().GetText();
-                    return new PrintCommand(text, writer);
+                    return new PrintCommand(null, null, writer, text);
+                }
+                // Check if the expression is a variable
+                else if (expressionContext.func_() != null)
+                {
+                    var funcContext = expressionContext.func_();
+                    var varDeclContext = funcContext.vardecl();
+                    if (varDeclContext != null)
+                    {
+                        string variableName = varDeclContext.GetText();
+                        return new PrintCommand(variableName, variables, writer);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Only static strings, numbers, and variables are currently supported in PRINT statements");
+                    }
                 }
                 else
                 {
-                    throw new NotImplementedException("Only static strings and numbers are currently supported in PRINT statements");
+                    throw new NotImplementedException("Only static strings, numbers, and variables are currently supported in PRINT statements");
                 }
             }
             else
@@ -98,6 +111,9 @@ namespace JesseFreeman.BasicInterpreter.Commands
                 throw new ParsingException("PRINT statement must contain an expression");
             }
         }
+
+
+
 
 
         public override ICommand VisitEndstmt(BasicParser.EndstmtContext context)
@@ -113,6 +129,16 @@ namespace JesseFreeman.BasicInterpreter.Commands
             // Create a new GotoCommand with the target line number
             return new GotoCommand(targetLineNumber);
         }
+
+        public override ICommand VisitLetstmt(BasicParser.LetstmtContext context)
+        {
+            // Get the variable name from the variable assignment
+            string variableName = context.variableassignment().vardecl().var_().GetText();
+
+            // Create a new LetCommand with the variable name and expression
+            return new LetCommand(variableName, context.variableassignment().exprlist().expression(0), variables, writer);
+        }
+
 
         //public override ICommand VisitGosubstmt(BasicParser.GosubstmtContext context)
         //{
