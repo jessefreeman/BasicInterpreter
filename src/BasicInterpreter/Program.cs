@@ -10,7 +10,7 @@ class Program
         var interpreter = new BasicInterpreter(writer, reader);
         interpreter.MaxIterations = 3;
 
-        var code = "10 PRINT 123\n20 GOTO 10\n30 END";
+        var code = "10 PRINT 123.0";
 
         interpreter.Load(code);
 

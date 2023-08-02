@@ -68,8 +68,5 @@ namespace JesseFreeman.BasicInterpreter.Commands
             }
         }
 
-
-
-
     }
 }

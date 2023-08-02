@@ -9,11 +9,11 @@
     public interface IExpression
     {
         /// <summary>
-        /// Evaluates the expression.
+        /// Evaluates the expression with the given operands.
         /// </summary>
-        /// <param name="left">The left operand of the expression.</param>
-        /// <param name="right">The right operand of the expression.</param>
+        /// <param name="operands">The operands of the expression.</param>
         /// <returns>The result of evaluating the expression.</returns>
-        object Evaluate(object left, object right);
+        object Evaluate(params object[] operands);
     }
+
 }
