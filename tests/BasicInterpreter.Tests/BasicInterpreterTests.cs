@@ -131,6 +131,20 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
+        [InlineData("10 PRINT 123", "123\n")] // Test with an integer
+        [InlineData("10 PRINT 123.0", "123\n")] // Test with a floating point number that is a whole number
+        [InlineData("10 PRINT 123.45", "123.45\n")] // Test with a floating point number
+        [InlineData("10 LET A = 123\n20 PRINT A", "123\n")] // Test with an integer
+        [InlineData("10 LET A = 123.0\n20 PRINT A", "123\n")] // Test with a floating point number that is a whole number
+        [InlineData("10 LET A = 123.45\n20 PRINT A", "123.45\n")] // Test with a floating point number
+        public void TestPrintCommandNumberFormating(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
         [InlineData("10 PRINT \"Hello, World!\"\n20 GOTO 40\n30 PRINT \"This will not be printed\"\n40 END", "Hello, World!\n")]
         [InlineData("10 GOTO 30\n20 PRINT \"This will not be printed\"\n30 PRINT \"Hello, World!\"\n40 END", "Hello, World!\n")]
         public void TestGotoCommand(string script, string expectedOutput)
