@@ -1,21 +1,12 @@
 ﻿using Antlr4.Runtime;
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using JesseFreeman.BasicInterpreter.Commands;
+using JesseFreeman.BasicInterpreter.Evaluators;
 using JesseFreeman.BasicInterpreter.Exceptions;
 using JesseFreeman.BasicInterpreter.IO;
 
 namespace JesseFreeman.BasicInterpreter
 {
-    public class ThrowingErrorListener : BaseErrorListener
-    {
-        public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
-        {
-            string errorMessage = $"Line {line}:{charPositionInLine} - {msg}";
-            throw new ParsingException(errorMessage, e);
-        }
-    }
-
-
 
     public class BasicInterpreter
     {
@@ -25,7 +16,10 @@ namespace JesseFreeman.BasicInterpreter
         private Dictionary<string, object> variables;
         private bool hasEnded = false;
         private int currentCommandIndex = 0;
-        private int CurrentLineNumber => commands[currentCommandIndex].lineNumber;
+
+        public IInputReader InputReader { get; }
+
+        private ExpressionEvaluator expressionEvaluator;
 
         public bool HasEnded
         {
@@ -39,12 +33,13 @@ namespace JesseFreeman.BasicInterpreter
         public BasicInterpreter(IOutputWriter writer, IInputReader inputReader)
         {
             variables = new Dictionary<string, object>();
+            expressionEvaluator = new ExpressionEvaluator(variables);
+
             visitor = new BasicCommandVisitor(this, variables, writer, inputReader);
             commands = new List<(int lineNumber, ICommand command)>();
             InputReader = inputReader;
+            
         }
-
-        public IInputReader InputReader { get; }
 
         public void Load(string script)
         {
@@ -56,26 +51,22 @@ namespace JesseFreeman.BasicInterpreter
             // Set the custom error strategy
             parser.ErrorHandler = new ThrowingErrorStrategy();
 
-            //parser.RemoveErrorListeners(); // remove default error listeners
-            //parser.AddErrorListener(new ThrowingErrorListener()); // add your custom error listener
-
-
             try
             {
                 var tree = parser.prog(); // Adjusted line
 
-            foreach (BasicParser.LineContext line in tree.line())
-            {
-                foreach (var amprstmt in line.amprstmt())
-                {
-                    var statement = amprstmt.statement();
-                    if (statement != null && statement.letstmt() != null)
-                    {
-                        string variableName = statement.letstmt().variableassignment().vardecl().GetText();
-                        variables[variableName] = null;
-                    }
-                }
-            }
+            //foreach (BasicParser.LineContext line in tree.line())
+            //{
+            //    foreach (var amprstmt in line.amprstmt())
+            //    {
+            //        var statement = amprstmt.statement();
+            //        if (statement != null && statement.letstmt() != null)
+            //        {
+            //            string variableName = statement.letstmt().variableassignment().vardecl().GetText();
+            //            variables[variableName] = null;
+            //        }
+            //    }
+            //}
 
             foreach (BasicParser.LineContext line in tree.line())
             {
@@ -97,7 +88,10 @@ namespace JesseFreeman.BasicInterpreter
 
         public void Run()
         {
-            int iterationCount = 0;
+            currentCommandIndex = 0; // Reset the command index
+            hasEnded = false; // Reset the hasEnded flag
+            int iterationCount = 0; // Reset the iteration count
+
             while (currentCommandIndex < commands.Count)
             {
                 iterationCount++;
@@ -131,9 +125,6 @@ namespace JesseFreeman.BasicInterpreter
             }
         }
 
-
-
-
         public void JumpToLine(int lineNumber)
         {
             var index = commands.FindIndex(cmd => cmd.lineNumber == lineNumber);
@@ -143,7 +134,6 @@ namespace JesseFreeman.BasicInterpreter
             }
             currentCommandIndex = index;
         }
-
 
     }
 }

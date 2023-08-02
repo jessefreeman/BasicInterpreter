@@ -1,64 +1,41 @@
-﻿using JesseFreeman.BasicInterpreter.AntlrGenerated;
-using JesseFreeman.BasicInterpreter.Exceptions;
-using JesseFreeman.BasicInterpreter.IO;
+﻿using JesseFreeman.BasicInterpreter.Evaluators;
 
 namespace JesseFreeman.BasicInterpreter.Commands
 {
     public class LetCommand : ICommand
     {
-        private string variableName;
-        private BasicParser.ExpressionContext expression;
-        private Dictionary<string, object> variables;
-        private IOutputWriter writer;
+        private string _variableName;
+        private IExpression _expression;
+        private Dictionary<string, object> _variables;
 
-        public LetCommand(string variableName, BasicParser.ExpressionContext expression, Dictionary<string, object> variables, IOutputWriter writer)
+        public LetCommand(string variableName, IExpression expression, Dictionary<string, object> variables)
         {
-            this.variableName = variableName;
-            this.expression = expression;
-            this.variables = variables;
-            this.writer = writer;
+            _variableName = variableName;
+            _expression = expression;
+            _variables = variables;
         }
 
         public void Execute()
         {
-            object value = null;
-
-            // Check if the expression is a string literal
-            if (expression.func_() != null && expression.func_().STRINGLITERAL() != null)
+            // Check if the variable is not yet defined and assign a default value
+            if (!_variables.ContainsKey(_variableName))
             {
-                string text = expression.func_().STRINGLITERAL().GetText();
-                // Remove the surrounding quotes from the string literal
-                text = text.Substring(1, text.Length - 2);
-                value = text;
-            }
-            // Check if the expression is a numeric literal
-            else if (expression.func_() != null && expression.func_().number() != null)
-            {
-                string text = expression.func_().number().GetText();
-                if (text.Contains("."))
+                // The variable is not yet defined, so we initialize it with a default value
+                if (_variableName.EndsWith("$"))
                 {
-                    value = double.Parse(text);
+                    // Variable names that end with '$' are strings
+                    _variables[_variableName] = "";
                 }
                 else
                 {
-                    value = int.Parse(text);
+                    // Other variables are numbers
+                    _variables[_variableName] = 0.0;
                 }
             }
-            else
-            {
-                throw new NotImplementedException("Only static strings and numbers are currently supported in LET statements");
-            }
 
-            if ((variableName.EndsWith("$") && value is string) || (!variableName.EndsWith("$") && (value is int || value is double)))
-            {
-                variables[variableName] = value;
-            }
-            else
-            {
-                string expectedType = variableName.EndsWith("$") ? "string" : "number";
-                string actualType = value is string ? "string" : (value is int ? "integer" : "floating-point number");
-                throw new InvalidTypeAssignmentException(variableName, expectedType, actualType);
-            }
+            object value = _expression.Evaluate();
+            _variables[_variableName] = value;
         }
+
     }
 }

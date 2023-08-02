@@ -1,57 +1,40 @@
-﻿using JesseFreeman.BasicInterpreter.Exceptions;
+﻿using JesseFreeman.BasicInterpreter.AntlrGenerated;
+using JesseFreeman.BasicInterpreter.Evaluators;
 using JesseFreeman.BasicInterpreter.IO;
 
 namespace JesseFreeman.BasicInterpreter.Commands
 {
     public class PrintCommand : ICommand
     {
-        private string variableName;
-        private Dictionary<string, object> variables;
-        private IOutputWriter writer;
-        private string literalValue;
+        private BasicParser.ExpressionContext _expressionContext;
+        private ExpressionEvaluator _expressionEvaluator;
+        private IOutputWriter _writer;
 
-        public PrintCommand(string variableName, Dictionary<string, object> variables, IOutputWriter writer, string literalValue = null)
+        public PrintCommand(BasicParser.ExpressionContext expressionContext, ExpressionEvaluator expressionEvaluator, IOutputWriter writer)
         {
-            this.variableName = variableName;
-            this.variables = variables;
-            this.writer = writer;
-            this.literalValue = literalValue;
+            _expressionContext = expressionContext;
+            _expressionEvaluator = expressionEvaluator;
+            _writer = writer;
         }
 
         public void Execute()
         {
-            if (literalValue != null)
+            IExpression expression = _expressionEvaluator.Visit(_expressionContext);
+            object result = expression.Evaluate();
+            string output;
+
+            if (result is double number)
             {
-                // Try to parse the literal value as a double
-                if (double.TryParse(literalValue, out double number))
-                {
-                    // The literal value is a number, so apply the formatting logic
-                    writer.WriteLine(FormatNumber(number));
-                }
-                else
-                {
-                    // The literal value is not a number, so print it as is
-                    writer.WriteLine(literalValue);
-                }
-            }
-            else if (variables.ContainsKey(variableName))
-            {
-                object variableValue = variables[variableName];
-                if (variableValue is double number)
-                {
-                    // The variable is a number, so apply the formatting logic
-                    writer.WriteLine(FormatNumber(number));
-                }
-                else
-                {
-                    // The variable is not a number, so print it as is
-                    writer.WriteLine(variableValue.ToString());
-                }
+                // The result is a number, so apply the formatting logic
+                output = FormatNumber(number);
             }
             else
             {
-                throw new VariableNotDefinedException(variableName);
+                // The result is not a number, so print it as is
+                output = result.ToString();
             }
+
+            _writer.WriteLine(output);
         }
 
         private string FormatNumber(double number)
@@ -67,6 +50,7 @@ namespace JesseFreeman.BasicInterpreter.Commands
                 return number.ToString();
             }
         }
-
     }
+
+
 }
