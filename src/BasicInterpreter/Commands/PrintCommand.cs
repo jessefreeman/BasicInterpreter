@@ -26,16 +26,7 @@ namespace JesseFreeman.BasicInterpreter.Commands
                 if (double.TryParse(literalValue, out double number))
                 {
                     // The literal value is a number, so apply the formatting logic
-                    if (number % 1 == 0)
-                    {
-                        // The number is a whole number, so print it without a decimal point
-                        writer.WriteLine(((int)number).ToString());
-                    }
-                    else
-                    {
-                        // The number is not a whole number, so print it with a decimal point
-                        writer.WriteLine(number.ToString());
-                    }
+                    writer.WriteLine(FormatNumber(number));
                 }
                 else
                 {
@@ -46,19 +37,10 @@ namespace JesseFreeman.BasicInterpreter.Commands
             else if (variables.ContainsKey(variableName))
             {
                 object variableValue = variables[variableName];
-                if (variableValue is double)
+                if (variableValue is double number)
                 {
-                    double number = (double)variableValue;
-                    if (number == Math.Truncate(number))
-                    {
-                        // The number is a whole number, so print it without a decimal point
-                        writer.WriteLine(((int)number).ToString());
-                    }
-                    else
-                    {
-                        // The number is not a whole number, so print it with a decimal point
-                        writer.WriteLine(number.ToString());
-                    }
+                    // The variable is a number, so apply the formatting logic
+                    writer.WriteLine(FormatNumber(number));
                 }
                 else
                 {
@@ -71,6 +53,21 @@ namespace JesseFreeman.BasicInterpreter.Commands
                 throw new VariableNotDefinedException(variableName);
             }
         }
+
+        private string FormatNumber(double number)
+        {
+            if (number == Math.Truncate(number))
+            {
+                // The number is a whole number, so print it without a decimal point
+                return ((int)number).ToString();
+            }
+            else
+            {
+                // The number is not a whole number, so print it with a decimal point
+                return number.ToString();
+            }
+        }
+
 
 
 
