@@ -222,6 +222,163 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
+        [InlineData("10 LET A = 5\n20 LET B = 3\n30 PRINT A + B", "8\n")] // Basic addition
+        [InlineData("10 LET A = -5\n20 LET B = 3\n30 PRINT A + B", "-2\n")] // Addition with negative numbers
+        [InlineData("10 LET A = 5.5\n20 LET B = 3.5\n30 PRINT A + B", "9\n")] // Addition with decimal numbers
+        [InlineData("10 LET A = 5\n20 PRINT A + 3", "8\n")] // Addition with a variable and a literal
+        [InlineData("10 PRINT 5 + 3", "8\n")] // Addition with literals
+        [InlineData("10 LET A = 5\n20 LET B = -3\n30 PRINT A + B", "2\n")] // Addition with negative numbers
+        [InlineData("10 LET A = 5\n20 LET B = 3\n30 LET C = A + B\n40 PRINT C", "8\n")] // Addition result stored in a variable
+        [InlineData("10 LET A = 5\n20 PRINT A + A", "10\n")] // Addition with the same variable
+        [InlineData("10 LET A = 5\n20 PRINT A + A + A", "15\n")] // Addition with the same variable multiple times
+        [InlineData("10 LET A = 5\n20 LET B = 3\n30 PRINT A + B + 2", "10\n")] // Addition with two variables and a literal
+        public void TestAdditonOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+
+        [Theory]
+        [InlineData("10 LET A = 5\n20 LET B = 3\n30 PRINT A - B", "2\n")] // Basic subtraction
+        [InlineData("10 LET A = -5\n20 LET B = 3\n30 PRINT A - B", "-8\n")] // Subtraction with negative numbers
+        [InlineData("10 LET A = 5.5\n20 LET B = 3.5\n30 PRINT A - B", "2\n")] // Subtraction with decimal numbers
+        [InlineData("10 LET A = 5\n20 PRINT A - 3", "2\n")] // Subtraction with a variable and a literal
+        [InlineData("10 PRINT 5 - 3", "2\n")] // Subtraction with literals
+        public void TestSubtractionOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 5\n20 LET B = 3\n30 PRINT A * B", "15\n")] // Basic multiplication
+        [InlineData("10 LET A = -5\n20 LET B = 3\n30 PRINT A * B", "-15\n")] // Multiplication with negative numbers
+        [InlineData("10 LET A = 5.5\n20 LET B = 3.5\n30 PRINT A * B", "19.25\n")] // Multiplication with decimal numbers
+        [InlineData("10 LET A = 5\n20 PRINT A * 3", "15\n")] // Multiplication with a variable and a literal
+        [InlineData("10 PRINT 5 * 3", "15\n")] // Multiplication with literals
+        public void TestMultiplicationOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 6\n20 LET B = 3\n30 PRINT A / B", "2\n")] // Basic division
+        [InlineData("10 LET A = -6\n20 LET B = 3\n30 PRINT A / B", "-2\n")] // Division with negative numbers
+        [InlineData("10 LET A = 5.5\n20 LET B = 2.5\n30 PRINT A / B", "2.2\n")] // Division with decimal numbers
+        [InlineData("10 LET A = 6\n20 PRINT A / 3", "2\n")] // Division with a variable and a literal
+        [InlineData("10 PRINT 6 / 3", "2\n")] // Division with literals
+        public void TestDivisionOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = -5\n20 PRINT ABS(A)", "5\n")] // Absolute value of negative number
+        [InlineData("10 LET A = 5\n20 PRINT ABS(A)", "5\n")] // Absolute value of positive number
+        [InlineData("10 PRINT ABS(-3)", "3\n")] // Absolute value of negative literal
+        public void TestAbsOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 0.5\n20 PRINT ATN(A)", "0.4636476090008061\n")] // Arctangent of number
+        [InlineData("10 PRINT ATN(1)", "0.7853981633974483\n")] // Arctangent of literal
+        public void TestAtnOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 0\n20 PRINT COS(A)", "1\n")] // Cosine of number
+        [InlineData("10 PRINT COS(0)", "1\n")] // Cosine of literal
+        public void TestCosOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 2\n20 PRINT EXP(A)", "7.38905609893065\n")] // Exponential of number
+        [InlineData("10 PRINT EXP(1)", "2.718281828459045\n")] // Exponential of literal
+        public void TestExpOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 2.8\n20 PRINT INT(A)", "2\n")] // Integer part of number
+        [InlineData("10 PRINT INT(2.8)", "2\n")] // Integer part of literal
+        public void TestIntOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 10\n20 PRINT LOG(A)", "2.302585092994046\n")] // Logarithm of number
+        [InlineData("10 PRINT LOG(10)", "2.302585092994046\n")] // Logarithm of literal
+        public void TestLogOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 0.5\n20 PRINT RND(A)", "0.5\n")] // Random number (note: this test may need to be adjusted based on your implementation of RND)
+        [InlineData("10 PRINT RND(1)", "1\n")] // Random literal (note: this test may need to be adjusted based on your implementation of RND)
+        public void TestRndOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = -2\n20 PRINT SGN(A)", "-1\n")] // Sign of number
+        [InlineData("10 PRINT SGN(-2)", "-1\n")] // Sign of literal
+        [InlineData("10 PRINT SGN(0)", "0\n")] // Sign of zero
+        public void TestSgnOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 LET A = 0.5\n20 PRINT SIN(A)", "0.479425538604203\n")] // Sine of number
+        [InlineData("10 PRINT SIN(0.5)", "0.479425538604203\n")] // Sine of literal
+        public void TestSinOutput(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+
+        // Continue with other unary operations...
+
+
+
+        // Direct expression tests
+
+        [Theory]
         [InlineData(0, 0.0)] // Abs(0) = 0.0
         [InlineData(5, 5.0)] // Abs(5) = 5.0
         [InlineData(-5, 5.0)] // Abs(-5) = 5.0

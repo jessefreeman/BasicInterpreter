@@ -55,31 +55,19 @@ namespace JesseFreeman.BasicInterpreter
             {
                 var tree = parser.prog(); // Adjusted line
 
-            //foreach (BasicParser.LineContext line in tree.line())
-            //{
-            //    foreach (var amprstmt in line.amprstmt())
-            //    {
-            //        var statement = amprstmt.statement();
-            //        if (statement != null && statement.letstmt() != null)
-            //        {
-            //            string variableName = statement.letstmt().variableassignment().vardecl().GetText();
-            //            variables[variableName] = null;
-            //        }
-            //    }
-            //}
-
-            foreach (BasicParser.LineContext line in tree.line())
-            {
-                int lineNumber = int.Parse(line.linenumber().GetText()); // Adjusted line
-                ICommand command = visitor.Visit(line);
-                if (commands.Any(cmd => cmd.lineNumber == lineNumber))
+                foreach (BasicParser.LineContext line in tree.line())
                 {
-                    throw new DuplicateLineNumberException(lineNumber);
+                    int lineNumber = int.Parse(line.linenumber().GetText()); // Adjusted line
+                    ICommand command = visitor.Visit(line);
+                    if (commands.Any(cmd => cmd.lineNumber == lineNumber))
+                    {
+                        throw new DuplicateLineNumberException(lineNumber);
+                    }
+                    commands.Add((lineNumber, command));
                 }
-                commands.Add((lineNumber, command));
-            }
-            commands.Sort((cmd1, cmd2) => cmd1.lineNumber.CompareTo(cmd2.lineNumber));
-            }
+                    commands.Sort((cmd1, cmd2) => cmd1.lineNumber.CompareTo(cmd2.lineNumber));
+                }
+
             catch (RecognitionException ex)
             {
                 throw new ParsingException("Syntax error in script", ex);

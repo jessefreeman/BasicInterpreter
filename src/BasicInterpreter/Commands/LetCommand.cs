@@ -1,41 +1,32 @@
-﻿using JesseFreeman.BasicInterpreter.Evaluators;
+﻿using JesseFreeman.BasicInterpreter.AntlrGenerated;
+using JesseFreeman.BasicInterpreter.Evaluators;
 
 namespace JesseFreeman.BasicInterpreter.Commands
 {
     public class LetCommand : ICommand
     {
         private string _variableName;
-        private IExpression _expression;
+        private BasicParser.ExpressionContext _expressionContext;
+        private ExpressionEvaluator _expressionEvaluator;
         private Dictionary<string, object> _variables;
 
-        public LetCommand(string variableName, IExpression expression, Dictionary<string, object> variables)
+        public LetCommand(string variableName, BasicParser.ExpressionContext expressionContext, ExpressionEvaluator expressionEvaluator, Dictionary<string, object> variables)
         {
             _variableName = variableName;
-            _expression = expression;
+            _expressionContext = expressionContext;
+            _expressionEvaluator = expressionEvaluator;
             _variables = variables;
         }
 
         public void Execute()
         {
-            // Check if the variable is not yet defined and assign a default value
-            if (!_variables.ContainsKey(_variableName))
-            {
-                // The variable is not yet defined, so we initialize it with a default value
-                if (_variableName.EndsWith("$"))
-                {
-                    // Variable names that end with '$' are strings
-                    _variables[_variableName] = "";
-                }
-                else
-                {
-                    // Other variables are numbers
-                    _variables[_variableName] = 0.0;
-                }
-            }
-
-            object value = _expression.Evaluate();
+            IExpression expression = _expressionEvaluator.Visit(_expressionContext);
+            object value = expression.Evaluate();
             _variables[_variableName] = value;
-        }
 
+            // Log the execution of the command
+            Console.WriteLine($"Executed LET command: {_variableName} = {value}");
+        }
     }
+
 }

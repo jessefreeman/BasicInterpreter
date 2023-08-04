@@ -85,8 +85,7 @@ namespace JesseFreeman.BasicInterpreter.Commands
         {
             string variableName = context.variableassignment().vardecl().var_().GetText();
             var expressionContext = context.variableassignment().exprlist().expression(0);
-            IExpression expression = this.expressionEvaluator.Visit(expressionContext);
-            return new LetCommand(variableName, expression, variables);
+            return new LetCommand(variableName, expressionContext, this.expressionEvaluator, this.variables);
         }
 
         public override ICommand VisitEndstmt([NotNull] BasicParser.EndstmtContext context)
