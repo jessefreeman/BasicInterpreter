@@ -19,8 +19,6 @@ namespace JesseFreeman.BasicInterpreter
 
         public IInputReader InputReader { get; }
 
-        private ExpressionEvaluator expressionEvaluator;
-
         public bool HasEnded
         {
             get { return hasEnded; }
@@ -33,7 +31,6 @@ namespace JesseFreeman.BasicInterpreter
         public BasicInterpreter(IOutputWriter writer, IInputReader inputReader)
         {
             variables = new Dictionary<string, object>();
-            expressionEvaluator = new ExpressionEvaluator(variables);
 
             visitor = new BasicCommandVisitor(this, variables, writer, inputReader);
             commands = new List<(int lineNumber, ICommand command)>();

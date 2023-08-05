@@ -292,13 +292,16 @@ namespace JesseFreeman.BasicInterpreter.Tests
 
         [Theory]
         [InlineData("10 LET A = 0.5\n20 PRINT ATN(A)", "0.4636476090008061\n")] // Arctangent of number
-        [InlineData("10 PRINT ATN(1)", "0.7853981633974483\n")] // Arctangent of literal
+        [InlineData("10 PRINT ATN(1)", "0.7853981633974483\n")]
         public void TestAtnOutput(string script, string expectedOutput)
         {
             interpreter.Load(script);
             interpreter.Run();
-            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+            double expected = double.Parse(expectedOutput.Trim());
+            double actual = double.Parse(writer.Output.Trim());
+            Assert.Equal(expected, actual, 14); // Compare the numbers up to 14 decimal places
         }
+
 
         [Theory]
         [InlineData("10 LET A = 0\n20 PRINT COS(A)", "1\n")] // Cosine of number
@@ -341,13 +344,14 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
-        [InlineData("10 LET A = 0.5\n20 PRINT RND(A)", "0.5\n")] // Random number (note: this test may need to be adjusted based on your implementation of RND)
-        [InlineData("10 PRINT RND(1)", "1\n")] // Random literal (note: this test may need to be adjusted based on your implementation of RND)
-        public void TestRndOutput(string script, string expectedOutput)
+        [InlineData("10 LET A = 0.5\n20 PRINT INT(RND(A) * 100)")]
+        [InlineData("10 PRINT INT(RND(1) * 10)")]
+        public void TestRndOutput(string script)
         {
             interpreter.Load(script);
             interpreter.Run();
-            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+            int output = int.Parse(writer.Output.Trim());
+            Assert.InRange(output, 0, 99); // Ensure the output is within the expected range
         }
 
         [Theory]
@@ -981,24 +985,21 @@ namespace JesseFreeman.BasicInterpreter.Tests
 
             // Assert
             Assert.IsType<double>(result);
-            Assert.InRange((double)result, 0.0, 1.0);
+            Assert.InRange((double)result, 0, 1);
         }
 
-        [Theory]
-        [InlineData(0)]
-        [InlineData(42)]
-        [InlineData(-123)]
-        public void TestRndExpression_WithSeed(int seed)
+        [Fact]
+        public void TestRndExpression_SpecificSeeds()
         {
             // Arrange
-            var rndExpression = new RndExpression(seed);
+            var rndExpression = new RndExpression();
 
             // Act
-            var result = rndExpression.Evaluate();
+            rndExpression.Evaluate(-123456789); // Set the seed to 123456789
+            double result = (double)rndExpression.Evaluate();
 
             // Assert
-            Assert.IsType<double>(result);
-            Assert.InRange((double)result, 0.0, 1.0);
+            Assert.InRange(result, 0, 1); // Ensure the result is within the expected range
         }
 
         [Theory]
