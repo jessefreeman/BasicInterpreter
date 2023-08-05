@@ -72,10 +72,10 @@
      | ~~Sign Expression~~               | ~~Represents an expression that may optionally start with a plus (+) or minus (-) sign (`signExpression`).~~ | ~~`-A`, `+B`~~                                   | ~~Critical~~     |
      | ~~Multiplying Expression~~        | ~~Represents an expression with multiplication or division (`multiplyingExpression`).~~ | ~~`A * B`, `C / D`~~                             | ~~Critical~~     |
      | ~~Adding Expression~~             | ~~Represents an expression with addition or subtraction (`addingExpression`).~~ | ~~`A + B`, `C - D`~~                             | ~~Critical~~     |
-     | Expression                        | Represents a general expression, which can be a combination of various operators and operands (`expression`). | `A + B * C`, `D / E - F`                         | Critical         |
+     | ~~Expression~~                    | ~~Represents a general expression, which can be a combination of various operators and operands (`expression`).~~ | ~~`A + B * C`, `D / E - F`~~                     | ~~Critical~~     |
      | Statement with Optional Ampersand | Represents a statement that may optionally start with an ampersand (`amprstmt`). | `&PRINT "Hello, world!"`                         | Nice to have     |
      | Ampersand Operator                | Represents the ampersand (&) operator (`amperoper`).         | `&PRINT`                                         | Nice to have     |
-     | Variable Suffix                   | Represents the suffix of a variable, which can be `$` for string variables or `%` for integer variables (`varsuffix`). | `A$`, `B%`                                       | Nice to have     |
+     | ~~Variable Suffix~~               | ~~Represents the suffix of a variable, which can be `$` for string variables (`varsuffix`).~~ | ~~`A$`~~                                         | ~~Nice to have~~ |
      | ~~Exponent Expression~~           | ~~Represents an expression with an exponent (`exponentExpression`).~~ | ~~`2^3`~~                                        | ~~Nice to have~~ |
      | ~~Not Equal Operator~~            | ~~Represents the not equal (`<>`) operator (`neq`).~~        | ~~`IF A <> B THEN PRINT "A is not equal to B"`~~ | ~~Nice to have~~ |
      | Data                              | Represents a piece of data, which can be a number or a string literal (`datum`). | `DATA 10, "Hello"`                               | Nice to have     |
@@ -126,34 +126,34 @@
    
      Here's a brief summary of some key functions in BASIC:
    
-     | Function               | Description                                  | Example                                          | Importance              |
-     | ---------------------- | -------------------------------------------- | ------------------------------------------------ | ----------------------- |
-     | Number Function        | Represents a numeric value.                  | `LET A = 10`                                     | Critical                |
-     | String Function        | Represents a string value.                   | `LET A$ = "Hello"`                               | Critical                |
-     | Relational Operators   | Compare two values.                          | `IF A > B THEN PRINT "A is greater"`             | Critical                |
-     | Arithmetic Operators   | Perform arithmetic operations.               | `LET C = A + B`                                  | Critical                |
-     | Logical Operators      | Perform logical operations.                  | `IF A > 10 AND B > 10 THEN PRINT "Both greater"` | Critical                |
-     | Sqr Function           | Calculates the square root of a number.      | `PRINT SQR(A)`                                   | Nice to have            |
-     | Chr Function           | Converts a number to a character.            | `PRINT CHR$(65)`                                 | Nice to have            |
-     | Len Function           | Returns the length of a string.              | `PRINT LEN(A$)`                                  | Nice to have            |
-     | Asc Function           | Returns the ASCII value of a character.      | `PRINT ASC("A")`                                 | Nice to have            |
-     | Mid Function           | Returns a substring.                         | `PRINT MID$(A$, 2, 3)`                           | Nice to have            |
-     | Peek Function          | Returns the value of a memory location.      | `PRINT PEEK(1024)`                               | Nice to have            |
-     | Int Function           | Rounds a number down to the nearest integer. | `PRINT INT(3.14)`                                | Nice to have            |
-     | Spc Function           | Inserts a number of spaces.                  | `PRINT "Hello"; SPC(5); "World"`                 | Nice to have            |
-     | Fre Function           | Returns the amount of free memory.           | `PRINT FRE(0)`                                   | Nice to have            |
-     | Pos Function           | Returns the current cursor column.           | `PRINT POS(0)`                                   | Nice to have            |
-     | Tab Function           | Moves the cursor to a specific column.       | `PRINT TAB(10); "Hello"`                         | Nice to have            |
-     | ~~Sin Function~~       | ~~Calculates the sine of an angle.~~         | ~~`PRINT SIN(45)`~~                              | ~~Nice to have~~        |
-     | ~~Cos Function~~       | ~~Calculates the cosine of an angle.~~       | ~~`PRINT COS(45)`~~                              | ~~Nice to have~~        |
-     | ~~Tan Function~~       | ~~Calculates the tangent of an angle.~~      | ~~`PRINT TAN(45)`~~                              | ~~Nice to have~~        |
-     | ~~Atn Function~~       | ~~Calculates the arctangent of a number.~~   | ~~`PRINT ATN(1)`~~                               | ~~Nice to have~~        |
-     | ~~Rnd Function~~       | ~~Returns a random number.~~                 | ~~`PRINT RND(1)`~~                               | ~~Nice to have~~        |
-     | <u>~~Fn Function~~</u> | <u>~~Calls a user-defined function.~~</u>    | <u>~~`PRINT FN A(5)`~~</u>                       | <u>~~Nice to have~~</u> |
-     | Pdl Function           | Reads the position of the paddle.            | `PRINT PDL(0)`                                   | Not needed              |
-     | Scrn Function          | Reads the color of a pixel.                  | `PRINT SCRN(100, 100)`                           | Not needed              |
-     | Usr Function           | Calls a machine language subroutine.         | `PRINT USR(768)`                                 | Not needed              |
-     | Ampersand Function     | Calls a machine language subroutine.         | `PRINT &A9,00`                                   | Not needed              |
+     | Function                 | Description                                  | Example                                          | Importance              |
+     | ------------------------ | -------------------------------------------- | ------------------------------------------------ | ----------------------- |
+     | ~~Number Function~~      | ~~Represents a numeric value.~~              | ~~`LET A = 10`~~                                 | ~~Critical~~            |
+     | ~~String Function~~      | ~~Represents a string value.~~               | ~~`LET A$ = "Hello"`~~                           | ~~Critical~~            |
+     | Relational Operators     | Compare two values.                          | `IF A > B THEN PRINT "A is greater"`             | Critical                |
+     | ~~Arithmetic Operators~~ | ~~Perform arithmetic operations.~~           | ~~`LET C = A + B`~~                              | ~~Critical~~            |
+     | Logical Operators        | Perform logical operations.                  | `IF A > 10 AND B > 10 THEN PRINT "Both greater"` | Critical                |
+     | ~~Sqr Function~~         | ~~Calculates the square root of a number.~~  | ~~`PRINT SQR(A)`~~                               | ~~Nice to have~~        |
+     | Chr Function             | Converts a number to a character.            | `PRINT CHR$(65)`                                 | Nice to have            |
+     | Len Function             | Returns the length of a string.              | `PRINT LEN(A$)`                                  | Nice to have            |
+     | Asc Function             | Returns the ASCII value of a character.      | `PRINT ASC("A")`                                 | Nice to have            |
+     | Mid Function             | Returns a substring.                         | `PRINT MID$(A$, 2, 3)`                           | Nice to have            |
+     | Peek Function            | Returns the value of a memory location.      | `PRINT PEEK(1024)`                               | Nice to have            |
+     | Int Function             | Rounds a number down to the nearest integer. | `PRINT INT(3.14)`                                | Nice to have            |
+     | Spc Function             | Inserts a number of spaces.                  | `PRINT "Hello"; SPC(5); "World"`                 | Nice to have            |
+     | Fre Function             | Returns the amount of free memory.           | `PRINT FRE(0)`                                   | Nice to have            |
+     | Pos Function             | Returns the current cursor column.           | `PRINT POS(0)`                                   | Nice to have            |
+     | Tab Function             | Moves the cursor to a specific column.       | `PRINT TAB(10); "Hello"`                         | Nice to have            |
+     | ~~Sin Function~~         | ~~Calculates the sine of an angle.~~         | ~~`PRINT SIN(45)`~~                              | ~~Nice to have~~        |
+     | ~~Cos Function~~         | ~~Calculates the cosine of an angle.~~       | ~~`PRINT COS(45)`~~                              | ~~Nice to have~~        |
+     | ~~Tan Function~~         | ~~Calculates the tangent of an angle.~~      | ~~`PRINT TAN(45)`~~                              | ~~Nice to have~~        |
+     | ~~Atn Function~~         | ~~Calculates the arctangent of a number.~~   | ~~`PRINT ATN(1)`~~                               | ~~Nice to have~~        |
+     | ~~Rnd Function~~         | ~~Returns a random number.~~                 | ~~`PRINT RND(1)`~~                               | ~~Nice to have~~        |
+     | <u>~~Fn Function~~</u>   | <u>~~Calls a user-defined function.~~</u>    | <u>~~`PRINT FN A(5)`~~</u>                       | <u>~~Nice to have~~</u> |
+     | Pdl Function             | Reads the position of the paddle.            | `PRINT PDL(0)`                                   | Not needed              |
+     | Scrn Function            | Reads the color of a pixel.                  | `PRINT SCRN(100, 100)`                           | Not needed              |
+     | Usr Function             | Calls a machine language subroutine.         | `PRINT USR(768)`                                 | Not needed              |
+     | Ampersand Function       | Calls a machine language subroutine.         | `PRINT &A9,00`                                   | Not needed              |
    
      Please let me know if you want me to continue with the Apple Specific and Graphics/Sound Functionality table.
    
