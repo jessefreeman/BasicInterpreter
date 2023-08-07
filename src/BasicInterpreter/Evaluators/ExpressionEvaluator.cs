@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
+using JesseFreeman.BasicInterpreter.Commands;
 using JesseFreeman.BasicInterpreter.Exceptions;
 using System.Reflection;
 
@@ -71,7 +72,7 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
 
                 if (!variables.TryGetValue(varName, out object varValue))
                 {
-                    throw new VariableNotDefinedException($"Variable {varName} not found");
+                    return new VariableExpression(varName, variables);
                 }
 
                 switch (varValue)
@@ -107,7 +108,7 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
                 }
             }
 
-            throw new NotImplementedException($"Unhandled func_ alternative: {context.GetText()}");
+            throw new UnsupportedOperationException($"Unhandled func_ alternative: {context.GetText()}");
         }
 
         private object InvokeMethodIfExists(object obj, string methodName)
@@ -121,27 +122,7 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
             return method?.Invoke(obj, null);
         }
 
-        public override IExpression VisitAddingExpression([NotNull] BasicParser.AddingExpressionContext context)
-        {
-            return VisitExpressionWithBinaryOperation(context, operations);
-        }
-
-        public override IExpression VisitMultiplyingExpression([NotNull] BasicParser.MultiplyingExpressionContext context)
-        {
-            return VisitExpressionWithBinaryOperation(context, operations);
-        }
-
-        public override IExpression VisitExponentExpression([NotNull] BasicParser.ExponentExpressionContext context)
-        {
-            return VisitExpressionWithBinaryOperation(context, operations);
-        }
-
-        public override IExpression VisitExpression([NotNull] BasicParser.ExpressionContext context)
-        {
-            return VisitExpressionWithBinaryOperation(context, operations);
-        }
-
-        private IExpression VisitExpressionWithBinaryOperation(ParserRuleContext context, Dictionary<string, IExpression> ops)
+        private IExpression VisitBinaryExpression(ParserRuleContext context, Dictionary<string, IExpression> ops)
         {
             IExpression left = Visit(context.GetChild(0));
 
@@ -155,11 +136,86 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
                 }
                 else
                 {
-                    throw new NotImplementedException($"Unhandled operator: {operatorSymbol}");
+                    throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
                 }
             }
 
             return left;
         }
+
+        public override IExpression VisitAddingExpression([NotNull] BasicParser.AddingExpressionContext context)
+        {
+            return VisitBinaryExpression(context, operations);
+        }
+
+        public override IExpression VisitMultiplyingExpression([NotNull] BasicParser.MultiplyingExpressionContext context)
+        {
+            return VisitBinaryExpression(context, operations);
+        }
+
+        public override IExpression VisitExponentExpression([NotNull] BasicParser.ExponentExpressionContext context)
+        {
+            return VisitBinaryExpression(context, operations);
+        }
+
+        public override IExpression VisitExpression([NotNull] BasicParser.ExpressionContext context)
+        {
+            return VisitBinaryExpression(context, operations);
+        }
+
+        public override IExpression VisitRelationalExpression([NotNull] BasicParser.RelationalExpressionContext context)
+        {
+            // Check if the context contains the NOT token
+            if (context.GetText().StartsWith("NOT"))
+            {
+                // Get the expression that follows the NOT token
+                var exprContext = context.addingExpression(0);
+                if (exprContext == null)
+                {
+                    throw new Exception("Expression context is null after NOT token");
+                }
+
+                IExpression operand = Visit(exprContext);
+
+                // Apply the NOT operation
+                if (operations.TryGetValue("NOT", out IExpression notOperation))
+                {
+                    return new LambdaExpression(notOperation, new IExpression[] { operand });
+                }
+                else
+                {
+                    throw new UnsupportedOperationException("NOT operation not found in operations dictionary");
+                }
+            }
+
+            // Check if the context contains a relational expression
+            if (context.relop() == null)
+            {
+                // If not, treat it as an adding expression
+                return VisitAddingExpression(context.addingExpression(0));
+            }
+
+            // Get the left and right operands
+            var leftContext = context.addingExpression(0);
+            var rightContext = context.addingExpression(1);
+            if (leftContext == null || rightContext == null)
+            {
+                throw new Exception("Left or right context is null");
+            }
+
+            IExpression left = Visit(leftContext);
+            IExpression right = Visit(rightContext);
+
+            // Get the operation
+            string operatorSymbol = context.relop().GetText();
+            if (!operations.TryGetValue(operatorSymbol, out IExpression operation))
+            {
+                throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
+            }
+
+            return new LambdaExpression(operation, new IExpression[] { left, right });
+        }
+
     }
+
 }

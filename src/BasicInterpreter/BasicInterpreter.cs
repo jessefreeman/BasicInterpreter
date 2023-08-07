@@ -100,6 +100,12 @@ namespace JesseFreeman.BasicInterpreter
                     JumpToLine(gotoException.TargetLineNumber);
                     continue;
                 }
+                catch (SkipNextCommandException)
+                {
+                    // Skip the next command
+                    currentCommandIndex += 2;
+                    continue;
+                }
 
                 if (hasEnded)
                 {
@@ -109,6 +115,7 @@ namespace JesseFreeman.BasicInterpreter
                 currentCommandIndex++;
             }
         }
+
 
         public void JumpToLine(int lineNumber)
         {

@@ -221,3 +221,21 @@ Here's a brief summary:
 | Save Statement      | Saves the program to disk.                                   | `SAVE "PROGRAM.BAS"`     | Not needed |
 | Cls Statement       | Clears the screen.                                           | `CLS`                    | Not needed |
 | Include Statement   | Includes another BASIC program.                              | `INCLUDE "OTHER.BAS"`    | Not needed |
+
+Other things to do
+
+- Add unit tests for all of the errors
+  - DuplicateLineNumberException.cs
+  - FailedPredicateParsingException.cs
+  - GosubCommandException.cs
+  - GotoCommandException.cs
+  - InputMismatchParsingException.cs
+  - InvalidTypeAssignmentException.cs
+  - InvalidTypeOperationException.cs
+  - ParsingException.cs
+  - ReturnCommandException.cs
+  - ThrowingErrorListener.cs
+  - ThrowingErrorStrategy.cs
+  - UndefinedVariableException.cs
+  - UnsupportedOperationException.cs
+  - VariableNotDefinedException.cs

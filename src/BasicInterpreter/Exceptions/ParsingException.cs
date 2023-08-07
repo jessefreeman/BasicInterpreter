@@ -3,11 +3,13 @@ namespace JesseFreeman.BasicInterpreter.Exceptions
 {
     public class ParsingException : Exception
     {
-        public ParsingException(string message) : base(message)
+        public ParsingException(string errorContext)
+            : base($"Parsing error occurred in context: '{errorContext}'.")
         {
         }
 
-        public ParsingException(string message, Exception innerException) : base(message, innerException)
+        public ParsingException(string errorContext, Exception innerException)
+            : base($"Parsing error occurred in context: '{errorContext}'.", innerException)
         {
         }
     }

@@ -6,31 +6,13 @@
     /// </summary>
     public class InvalidTypeOperationException : Exception
     {
-        /// <summary>
-        /// Constructs a new InvalidTypeOperationException with no message or inner exception.
-        /// </summary>
-        public InvalidTypeOperationException()
+        public InvalidTypeOperationException(string operation)
+            : base($"Invalid type operation: '{operation}'.")
         {
         }
 
-        /// <summary>
-        /// Constructs a new InvalidTypeOperationException with a specified error message.
-        /// </summary>
-        /// <param name="message">The error message that explains the reason for the exception.</param>
-        public InvalidTypeOperationException(string message)
-            // Call the base constructor with the error message.
-            : base(message)
-        {
-        }
-
-        /// <summary>
-        /// Constructs a new InvalidTypeOperationException with a specified error message and a reference to the inner exception that is the cause of this exception.
-        /// </summary>
-        /// <param name="message">The error message that explains the reason for the exception.</param>
-        /// <param name="inner">The exception that is the cause of the current exception.</param>
-        public InvalidTypeOperationException(string message, Exception inner)
-            // Call the base constructor with the error message and the inner exception.
-            : base(message, inner)
+        public InvalidTypeOperationException(string operation, Exception inner)
+            : base($"Invalid type operation: '{operation}'.", inner)
         {
         }
     }

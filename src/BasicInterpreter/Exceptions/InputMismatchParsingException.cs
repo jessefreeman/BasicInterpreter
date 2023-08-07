@@ -5,8 +5,8 @@ namespace JesseFreeman.BasicInterpreter.Exceptions
 {
     public class InputMismatchParsingException : ParsingException
     {
-        public InputMismatchParsingException(string message, InputMismatchException innerException)
-            : base(message, innerException)
+        public InputMismatchParsingException(string errorContext, InputMismatchException innerException)
+            : base($"Input mismatch occurred in context: '{errorContext}'.", innerException)
         {
         }
     }

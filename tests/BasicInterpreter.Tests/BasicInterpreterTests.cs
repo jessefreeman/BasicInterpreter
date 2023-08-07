@@ -205,7 +205,8 @@ namespace JesseFreeman.BasicInterpreter.Tests
 
         [Theory]
         [InlineData("10 PRINT A$", "VariableNotDefinedException")] // Test undefined variable
-        [InlineData("10 LET A$ = 123\n20 PRINT A$", "InvalidTypeAssignmentException")] // Test setting a number to a string variable        //[InlineData("10 LET A = \"Hello\"\n20 PRINT A", "TypeMismatchException")] // Test setting a string to a number variable
+        [InlineData("10 LET A$ = 123\n20 PRINT A$", "InvalidTypeAssignmentException")] // Test setting a number to a string variable
+        [InlineData("10 LET A = \"Hello\"\n20 PRINT A", "TypeMismatchException")] // Test setting a string to a number variable
         [InlineData("10 LET A$ = \"Hello\"\n20 PRINT A$\n30 LET A$ = 123\n40 PRINT A$", "InvalidTypeAssignmentException")] // Test resetting a string variable to a number
         [InlineData("10 LET A = 123\n20 PRINT A\n30 LET A = \"Hello\"\n40 PRINT A", "InvalidTypeAssignmentException")] // Test resetting a number variable to a string
         public void TestLetCommandExceptions(string script, string expectedException)
@@ -375,6 +376,37 @@ namespace JesseFreeman.BasicInterpreter.Tests
             Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
         }
 
+        [Theory]
+        [InlineData("10 IF 5 > 3 THEN PRINT \"Correct\"", "Correct\n")]
+        [InlineData("10 IF 5 < 3 THEN PRINT \"Incorrect\"", "")]
+        [InlineData("10 IF 5 = 5 THEN PRINT \"Equal\"", "Equal\n")]
+        [InlineData("10 IF 5 <> 5 THEN PRINT \"Not Equal\"", "")]
+        [InlineData("10 IF 5 >= 3 THEN PRINT \"Greater or Equal\"", "Greater or Equal\n")]
+        [InlineData("10 IF 5 <= 3 THEN PRINT \"Less or Equal\"", "")]
+        [InlineData("10 IF 5 AND 3 THEN PRINT \"And Operation\"", "And Operation\n")]
+        [InlineData("10 IF 0 AND 3 THEN PRINT \"And Operation\"", "")]
+        [InlineData("10 IF 5 OR 0 THEN PRINT \"Or Operation\"", "Or Operation\n")]
+        [InlineData("10 IF 0 OR 0 THEN PRINT \"Or Operation\"", "")]
+        [InlineData("10 IF NOT 0 THEN PRINT \"Not Operation\"", "Not Operation\n")]
+        [InlineData("10 IF NOT 5 THEN PRINT \"Not Operation\"", "")]
+        [InlineData("10 IF 5 > 3 THEN 20\n20 PRINT \"Correct\"", "Correct\n")]
+        [InlineData("10 IF 5 < 3 THEN 20\n20 PRINT \"Incorrect\"", "")]
+        [InlineData("10 IF 5 > 3 THEN 30\n20 PRINT \"Incorrect\"\n30 PRINT \"Correct\"", "Correct\n")]
+        [InlineData("10 IF 5 < 3 THEN 30\n20 PRINT \"Correct\"\n30 PRINT \"Incorrect\"", "Incorrect\n")]
+        [InlineData("10 IF 5 > 3 THEN PRINT \"First True\"\n20 IF 4 < 6 THEN PRINT \"Second True\"", "First True\nSecond True\n")]
+        [InlineData("10 IF 5 < 3 THEN PRINT \"First False\"\n20 IF 4 > 6 THEN PRINT \"Second False\"", "")]
+        [InlineData("10 LET A = 5\n20 IF A = 5 THEN PRINT \"Variable Check\"", "Variable Check\n")]
+        [InlineData("10 LET A = 5\n20 LET B = 3\n30 IF A > B THEN PRINT \"A is Greater\"", "A is Greater\n")]
+        [InlineData("10 IF (5 + 3) * 2 = 16 THEN PRINT \"Math Check\"", "Math Check\n")]
+        [InlineData("10 LET A = 5\n20 LET B = 3\n30 IF A + B = 8 THEN PRINT \"Sum Check\"", "Sum Check\n")]
+        [InlineData("10 IF 5 < 3 THEN 40\n20 PRINT \"First\"\n30 PRINT \"Second\"\n40 PRINT \"Jumped\"", "Second\nJumped\n")]
+        [InlineData("10 IF 5 > 3 THEN 40\n20 PRINT \"Incorrect\"\n30 PRINT \"Still Incorrect\"\n40 PRINT \"Jumped\"", "Jumped\n")]
+        public void TestIfThen(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
 
         // Continue with other unary operations...
 
@@ -846,9 +878,9 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
-        [InlineData(true, false)]
-        [InlineData(false, true)]
-        public void TestLogicalNotExpression(bool operand, bool expectedResult)
+        [InlineData(0.0, 1.0)]  // Treat 0.0 as false and 1.0 as true
+        [InlineData(1.0, 0.0)]
+        public void TestLogicalNotExpression(double operand, double expectedResult)
         {
             // Arrange
             var logicalNotExpression = new LogicalNotExpression();

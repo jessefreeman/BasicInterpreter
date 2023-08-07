@@ -33,8 +33,7 @@ namespace JesseFreeman.BasicInterpreter.Commands
                 // The result is not a number, so print it as is
                 output = result.ToString();
             }
-            Console.WriteLine($"Printing result of expression: {output}");
-
+            
             _writer.WriteLine(output);
         }
 

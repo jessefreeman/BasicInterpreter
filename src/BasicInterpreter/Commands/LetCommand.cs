@@ -23,9 +23,6 @@ namespace JesseFreeman.BasicInterpreter.Commands
             IExpression expression = _expressionEvaluator.Visit(_expressionContext);
             object value = expression.Evaluate();
             _variables[_variableName] = value;
-
-            // Log the execution of the command
-            Console.WriteLine($"Executed LET command: {_variableName} = {value}");
         }
     }
 

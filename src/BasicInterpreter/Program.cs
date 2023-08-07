@@ -8,9 +8,9 @@ class Program
         var writer = new ConsoleOutputWriter();
         var reader = new ConsoleInputReader();
         var interpreter = new BasicInterpreter(writer, reader);
-        interpreter.MaxIterations = 3;
+        //interpreter.MaxIterations = 3;
 
-        var code = "10 LET A = -5\n20 PRINT ABS(A)";
+        var code = "10 LET A = 5\n20 LET B = 3\n30 IF A > B THEN PRINT \"A is Greater\"";
 
         interpreter.Load(code);
 

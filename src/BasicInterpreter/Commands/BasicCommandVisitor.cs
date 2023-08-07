@@ -99,5 +99,29 @@ namespace JesseFreeman.BasicInterpreter.Commands
             return new GotoCommand(targetLineNumber);
         }
 
+        public override ICommand VisitIfstmt([NotNull] BasicParser.IfstmtContext context)
+        {
+            // Visit the expression context to create the IExpression
+            IExpression condition = expressionEvaluator.Visit(context.expression());
+
+            int thenLineNumber = -1;
+            ICommand thenCommand = null;
+
+            // Check if the THEN branch is a statement or a line number
+            if (context.statement() != null)
+            {
+                // If it's a statement, visit the statement context to create the ICommand
+                thenCommand = Visit(context.statement());
+            }
+            else if (context.linenumber() != null)
+            {
+                // If it's a line number, parse it to set thenLineNumber
+                thenLineNumber = int.Parse(context.linenumber().GetText());
+            }
+
+            // Create and return the IfCommand with the condition, thenLineNumber, and thenCommand
+            return new IfCommand(condition, thenLineNumber, thenCommand);
+        }
+
     }
 }

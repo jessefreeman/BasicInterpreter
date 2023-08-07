@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace JesseFreeman.BasicInterpreter.Evaluators
+﻿namespace JesseFreeman.BasicInterpreter.Evaluators
 {
     /// <summary>
     /// The LogicalAndExpression class represents a logical AND operation. 
@@ -8,32 +6,33 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
     /// </summary>
     public class LogicalAndExpression : IExpression
     {
-        /// <summary>
-        /// Evaluates the logical AND of the left operand and the right operand.
-        /// </summary>
-        /// <param name="operands">The operands of the expression.</param>
-        /// <returns>The result of the logical AND operation on the left and right operands.</returns>
         public object Evaluate(params object[] operands)
         {
-            // Check if there are exactly two operands.
             if (operands.Length != 2)
             {
                 throw new ArgumentException("LogicalAndExpression requires exactly two operands.");
             }
 
-            // Retrieve the operands.
             var left = operands[0];
             var right = operands[1];
 
-            // If both operands are booleans, perform a logical AND operation.
             if (left is bool leftBool && right is bool rightBool)
             {
                 return leftBool && rightBool;
             }
+            else if (left is double leftDouble && right is double rightDouble)
+            {
+                // Convert doubles to integers for bitwise AND operation
+                int leftInt = (int)leftDouble;
+                int rightInt = (int)rightDouble;
+                // Return a boolean indicating whether the result is non-zero
+                return (leftInt & rightInt) != 0;
+            }
             else
             {
-                throw new ArgumentException("Both operands must be booleans for the logical AND operation.");
+                throw new ArgumentException("Operands must be either both booleans or both doubles for the logical AND operation.");
             }
         }
     }
+
 }

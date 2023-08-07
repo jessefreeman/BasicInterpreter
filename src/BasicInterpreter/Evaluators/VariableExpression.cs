@@ -1,4 +1,6 @@
 ﻿using System;
+using JesseFreeman.BasicInterpreter.Exceptions;
+
 namespace JesseFreeman.BasicInterpreter.Evaluators
 {
     public class VariableExpression : IExpression
@@ -20,9 +22,10 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
             }
             else
             {
-                throw new InvalidOperationException($"Variable '{_variableName}' is not defined.");
+                throw new VariableNotDefinedException($"Variable '{_variableName}' is not defined.");
             }
         }
+
     }
 }
 
