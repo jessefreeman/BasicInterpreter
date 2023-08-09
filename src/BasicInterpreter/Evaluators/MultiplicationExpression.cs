@@ -6,11 +6,6 @@
     /// </summary>
     public class MultiplicationExpression : IExpression
     {
-        /// <summary>
-        /// Evaluates the multiplication of the operands.
-        /// </summary>
-        /// <param name="operands">The operands of the expression.</param>
-        /// <returns>The result of multiplying the operands.</returns>
         public object Evaluate(params object[] operands)
         {
             // Check if there are exactly two operands.

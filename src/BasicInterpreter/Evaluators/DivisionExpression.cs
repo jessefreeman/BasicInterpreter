@@ -8,13 +8,6 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
     /// </summary>
     public class DivisionExpression : IExpression
     {
-        /// <summary>
-        /// Evaluates the division of the left operand by the right operand.
-        /// </summary>
-        /// <param name="operands">The operands of the expression (should contain two elements).</param>
-        /// <returns>The result of dividing the left operand by the right operand.</returns>
-        /// <exception cref="ArgumentException">Thrown when the number of operands is not exactly two.</exception>
-        /// <exception cref="DivideByZeroException">Thrown when the right operand is zero.</exception>
         public object Evaluate(params object[] operands)
         {
             if (operands == null || operands.Length != 2)

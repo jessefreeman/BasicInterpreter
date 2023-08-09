@@ -408,6 +408,25 @@ namespace JesseFreeman.BasicInterpreter.Tests
             Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
         }
 
+        [Theory]
+        [InlineData("10 PRINT (5 + 3)", "8\n")]
+        [InlineData("10 PRINT (10 - 3) * 2", "14\n")]
+        [InlineData("10 LET A = 5\n20 PRINT (A * 2) + 3", "13\n")]
+        [InlineData("10 PRINT (3 + 2) * (7 - 4)", "15\n")]
+        [InlineData("10 PRINT (5)", "5\n")]
+        [InlineData("10 PRINT (2 + 3) * 2 - (1 + 1)", "8\n")]
+        [InlineData("10 PRINT (2 * 3) / (1 + 1)", "3\n")]
+        [InlineData("10 PRINT (2 ^ 3)", "8\n")]
+        [InlineData("10 PRINT (2 * 3) + (4 / 2)", "8\n")]
+        [InlineData("10 PRINT (10 / 2) - (3 * 2)", "-1\n")]
+        public void TestCorrectOrderOfOperations(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+
         // Continue with other unary operations...
 
 
@@ -590,7 +609,7 @@ namespace JesseFreeman.BasicInterpreter.Tests
         public void TestExpExpression(object operand, double expectedResult)
         {
             // Arrange
-            var expExpression = new ExpExpression();
+            var expExpression = new ExponentiationExpression();
 
             // Act
             var result = (double)expExpression.Evaluate(operand);
@@ -603,7 +622,7 @@ namespace JesseFreeman.BasicInterpreter.Tests
         public void TestExpExpression_InvalidOperand_Exception()
         {
             // Arrange
-            var expExpression = new ExpExpression();
+            var expExpression = new ExponentiationExpression();
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => expExpression.Evaluate("invalid operand"));
@@ -613,20 +632,29 @@ namespace JesseFreeman.BasicInterpreter.Tests
         public void TestExpExpression_MissingOperand_Exception()
         {
             // Arrange
-            var expExpression = new ExpExpression();
+            var expExpression = new ExponentiationExpression();
 
             // Act & Assert
             Assert.Throws<ArgumentException>(() => expExpression.Evaluate());
         }
 
-        [Fact]
-        public void TestExpExpression_MultipleOperands_Exception()
+        [Theory]
+        [InlineData(2, 3, 8.0)]
+        [InlineData(3, 2, 9.0)]
+        [InlineData(5, 0, 1.0)]
+        [InlineData(2, -2, 0.25)]
+        [InlineData(-2, 3, -8.0)]
+        [InlineData(0, 0, 1.0)] // Depending on your implementation, 0^0 might be defined as 1
+        public void TestGeneralExponentiation(double baseValue, double exponent, double expectedResult)
         {
             // Arrange
-            var expExpression = new ExpExpression();
+            var expExpression = new ExponentiationExpression();
 
-            // Act & Assert
-            Assert.Throws<ArgumentException>(() => expExpression.Evaluate(1, 2));
+            // Act
+            var result = (double)expExpression.Evaluate(baseValue, exponent);
+
+            // Assert
+            Assert.Equal(expectedResult, result);
         }
 
         [Theory]

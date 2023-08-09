@@ -1,7 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
-using JesseFreeman.BasicInterpreter.Commands;
 using JesseFreeman.BasicInterpreter.Exceptions;
 using System.Reflection;
 
@@ -24,7 +23,7 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
                 { "-", new SubtractionExpression() },
                 { "*", new MultiplicationExpression() },
                 { "/", new DivisionExpression() },
-                { "^", new ExpExpression() },
+                { "^", new ExponentiationExpression() },
                 { "=", new EqualExpression() },
                 { "<", new LessThanExpression() },
                 { "<=", new LessThanOrEqualExpression() },
@@ -41,7 +40,7 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
                 { "absfunc", new AbsExpression() },
                 { "atnfunc", new AtnExpression() },
                 { "cosfunc", new CosExpression() },
-                { "expfunc", new ExpExpression() },
+                { "expfunc", new ExponentiationExpression() },
                 { "intfunc", new IntExpression() },
                 { "logfunc", new LogExpression() },
                 { "rndfunc", new RndExpression() },
@@ -84,6 +83,11 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
                     default:
                         throw new NotImplementedException($"Unhandled variable type: {varValue.GetType()}");
                 }
+            }
+
+            if (context.LPAREN() != null)
+            {
+                return Visit(context.expression());
             }
 
             return HandleUnaryOperations(context);
