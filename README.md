@@ -73,7 +73,7 @@ This table provides an overview of the core structural elements in the BASIC pro
 | ~~Multiplying Expression~~        | ~~Represents an expression with multiplication or division (`multiplyingExpression`).~~ | ~~`A * B`, `C / D`~~                             | ~~Critical~~     |
 | ~~Adding Expression~~             | ~~Represents an expression with addition or subtraction (`addingExpression`).~~ | ~~`A + B`, `C - D`~~                             | ~~Critical~~     |
 | ~~Expression~~                    | ~~Represents a general expression, which can be a combination of various operators and operands (`expression`).~~ | ~~`A + B * C`, `D / E - F`~~                     | ~~Critical~~     |
-| ~~Order of operations~~           | ~~Defines the precedence of arithmetic and logical operations, following the standard mathematical rules (e.g., parentheses, exponents, multiplication and division, addition and subtraction).~~ | ~~`(2 * 3) + (4 / 2)` evaluates to `8`~~         | ~~Essential~~    |
+| ~~Order of operations~~           | ~~Defines the precedence of arithmetic and logical operations, following the standard mathematical rules (e.g., parentheses, exponents, multiplication and division, addition and subtraction).~~ | ~~`(2 * 3) + (4 / 2)` evaluates to `8`~~         | ~~Critical~~     |
 | Statement with Optional Ampersand | Represents a statement that may optionally start with an ampersand (`amprstmt`). | `&PRINT "Hello, world!"`                         | Nice to have     |
 | Ampersand Operator                | Represents the ampersand (&) operator (`amperoper`).         | `&PRINT`                                         | Nice to have     |
 | ~~Variable Suffix~~               | ~~Represents the suffix of a variable, which can be `$` for string variables (`varsuffix`).~~ | ~~`A$`~~                                         | ~~Nice to have~~ |
@@ -81,7 +81,6 @@ This table provides an overview of the core structural elements in the BASIC pro
 | ~~Not Equal Operator~~            | ~~Represents the not equal (`<>`) operator (`neq`).~~        | ~~`IF A <> B THEN PRINT "A is not equal to B"`~~ | ~~Nice to have~~ |
 | Data                              | Represents a piece of data, which can be a number or a string literal (`datum`). | `DATA 10, "Hello"`                               | Nice to have     |
 | ~~Comment~~                       | ~~Represents a comment in the code. Anything following `REM` on a line is ignored by the interpreter (`COMMENT`).~~ | ~~`REM This is a comment`~~                      | ~~Nice to have~~ |
-| Order of operations               | Defines the precedence of arithmetic and logical operations, following the standard mathematical rules (e.g., parentheses, exponents, multiplication and division, addition and subtraction). | `(2 * 3) + (4 / 2)` evaluates to `8`             | Essential        |
 
 ### Statements
 
@@ -121,6 +120,23 @@ In the BASIC programming language, statements are the building blocks of the pro
 | Recall Statement     | Restores the program state.              | `RECALL`                             | Not needed   |
 | OnErr Statement      | Jumps to a line when an error occurs.    | `ONERR GOTO 1000`                    | Not needed   |
 | Ampersand Statement  | Calls a machine language subroutine.     | `&A9,00`                             | Not needed   |
+
+### Comma Separated Statements
+
+In BASIC, commas and other separators played a significant role in various statements. This functionality allowed for more concise code and facilitated the handling of multiple variables and expressions within a single line.
+
+| Functionality              | Description                                                  | Example                                 | Importance   |
+| -------------------------- | ------------------------------------------------------------ | --------------------------------------- | ------------ |
+| PRINT Statement            | Prints multiple expressions separated by commas.             | `PRINT A, B, "HELLO"`                   | Critical     |
+| INPUT Statement            | Accepts multiple variables, separated by commas.             | `INPUT A, B, C`                         | Critical     |
+| READ Statement             | Reads multiple values from a DATA statement, separated by commas. | `READ A, B, C`                          | Critical     |
+| DATA Statement             | Embeds literal values in the program, separated by commas.   | `DATA 10, 20, 30`                       | Critical     |
+| DIM Statement              | Declares the size of an array, dimensions separated by commas. | `DIM A(10, 20)`                         | Critical     |
+| POKE Statement             | Writes a value to a specific memory address, separated by a comma. | `POKE 53280, 0`                         | Critical     |
+| ON...GOTO/GOSUB Statements | Followed by a list of line numbers separated by commas.      | `ON A GOTO 100, 200, 300`               | Nice to Have |
+| DEF FN Statement           | Defines a function with parameters separated by commas.      | `DEF FN A(X, Y) = X + Y`                | Nice to Have |
+| Graphics Statements        | Takes multiple parameters separated by commas.               | `PLOT 10, 20` or `HLIN 10, 20 AT 5`     | Nice to Have |
+| RESTORE Statement          | Resets the READ pointer to a specific DATA line with comma-separated values. | `RESTORE 100` (with `100 DATA 1, 2, 3`) | Not Needed   |
 
 ### Functions
 

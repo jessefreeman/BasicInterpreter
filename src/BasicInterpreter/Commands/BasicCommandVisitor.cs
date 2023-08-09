@@ -23,62 +23,57 @@ namespace JesseFreeman.BasicInterpreter.Commands
             this.expressionEvaluator = new ExpressionEvaluator(variables);
         }
 
-        public override ICommand VisitProg(BasicParser.ProgContext context)
+        public class PrintCommand : ICommand
         {
-            // Process each line in the program
-            var commands = new List<ICommand>();
-            foreach (var line in context.line())
+            private BasicParser.ExpressionContext _expressionContext;
+            private ExpressionEvaluator _expressionEvaluator;
+            private IOutputWriter _writer;
+
+            public PrintCommand(BasicParser.ExpressionContext expressionContext, ExpressionEvaluator expressionEvaluator, IOutputWriter writer)
             {
-                var command = Visit(line);
-                commands.Add(command);
+                _expressionContext = expressionContext;
+                _expressionEvaluator = expressionEvaluator;
+                _writer = writer;
             }
 
-            // Return a CompositeCommand that holds all commands for this program
-            return new CompositeCommand(commands);
-        }
-
-        public override ICommand VisitLine(BasicParser.LineContext context)
-        {
-            // Process each statement on the line
-            var commands = new List<ICommand>();
-
-            // Check if context corresponds to a comment
-            if (context.COMMENT() != null || context.REM() != null)
+            public void Execute()
             {
-                // This line is a comment, so we can return a 'no operation' command or null
-                // Here's an example of returning null
-                return null;
-            }
+                IExpression expression = _expressionEvaluator.Visit(_expressionContext);
+                object result = expression.Evaluate();
+                string output;
 
-            foreach (var amprstmt in context.amprstmt())
-            {
-                var statement = amprstmt.statement();
-                if (statement != null)
+                if (result is double number)
                 {
-                    var command = Visit(statement);
-                    if (command == null)
-                    {
-                        throw new InvalidOperationException("Visit method returned null for a statement");
-                    }
-                    commands.Add(command);
+                    // The result is a number, so apply the formatting logic
+                    output = FormatNumber(number);
+                }
+                else
+                {
+                    // The result is not a number, so print it as is
+                    output = result.ToString();
+                }
+
+                _writer.WriteLine(output); // Write the final output string
+            }
+
+            private string FormatNumber(double number)
+            {
+                if (number == Math.Truncate(number))
+                {
+                    // The number is a whole number, so print it without a decimal point
+                    return ((int)number).ToString();
+                }
+                else
+                {
+                    // The number is not a whole number, so print it with a decimal point
+                    return number.ToString();
                 }
             }
-
-            // Return a CompositeCommand that holds all commands for this line
-            return new CompositeCommand(commands);
         }
 
         public override ICommand VisitPrintstmt1(BasicParser.Printstmt1Context context)
         {
-            if (context.expression() != null)
-            {
-                var expressionContext = context.expression();
-                return new PrintCommand(expressionContext, this.expressionEvaluator, writer);
-            }
-            else
-            {
-                throw new ParsingException("PRINT statement must contain an expression");
-            }
+            return new PrintCommand(context.expression(), this.expressionEvaluator, writer);
         }
 
         public override ICommand VisitLetstmt(BasicParser.LetstmtContext context)
@@ -121,6 +116,22 @@ namespace JesseFreeman.BasicInterpreter.Commands
 
             // Create and return the IfCommand with the condition, thenLineNumber, and thenCommand
             return new IfCommand(condition, thenLineNumber, thenCommand);
+        }
+
+        public override ICommand VisitForstmt1([NotNull] BasicParser.Forstmt1Context context)
+        {
+            string variableName = context.vardecl()[0].var_().varname().GetText(); // Extracting the variable name
+            IExpression startExpression = expressionEvaluator.Visit(context.expression(0));
+            IExpression endExpression = expressionEvaluator.Visit(context.expression(1));
+            IExpression stepExpression = context.expression(2) != null ? expressionEvaluator.Visit(context.expression(2)) : null;
+
+            return new ForCommand(variableName, startExpression, endExpression, stepExpression, interpreter);
+        }
+
+        public override ICommand VisitNextstmt([NotNull] BasicParser.NextstmtContext context)
+        {
+            var variableNames = context.vardecl()?.Select(v => v.var_().GetText()).ToList(); // Retrieve the variable names if provided
+            return new NextCommand(interpreter, variableNames);
         }
 
     }

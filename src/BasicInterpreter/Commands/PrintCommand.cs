@@ -1,4 +1,5 @@
-﻿using JesseFreeman.BasicInterpreter.AntlrGenerated;
+﻿using System.Text;
+using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using JesseFreeman.BasicInterpreter.Evaluators;
 using JesseFreeman.BasicInterpreter.IO;
 
@@ -19,22 +20,29 @@ namespace JesseFreeman.BasicInterpreter.Commands
 
         public void Execute()
         {
-            IExpression expression = _expressionEvaluator.Visit(_expressionContext);
-            object result = expression.Evaluate();
-            string output;
-
-            if (result is double number)
+            if (_expressionContext != null)
             {
-                // The result is a number, so apply the formatting logic
-                output = FormatNumber(number);
+                IExpression expression = _expressionEvaluator.Visit(_expressionContext);
+                object result = expression.Evaluate();
+                string output;
+
+                if (result is double number)
+                {
+                    // The result is a number, so apply the formatting logic
+                    output = FormatNumber(number);
+                }
+                else
+                {
+                    // The result is not a number, so print it as is
+                    output = result.ToString();
+                }
+
+                _writer.WriteLine(output); // Write the final output string
             }
             else
             {
-                // The result is not a number, so print it as is
-                output = result.ToString();
+                _writer.WriteLine(""); // Print a newline if no expression is provided
             }
-            
-            _writer.WriteLine(output);
         }
 
         private string FormatNumber(double number)

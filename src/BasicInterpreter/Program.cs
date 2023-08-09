@@ -10,7 +10,7 @@ class Program
         var interpreter = new BasicInterpreter(writer, reader);
         //interpreter.MaxIterations = 3;
 
-        var code = "10 LET A = 5\n20 LET B = 3\n30 IF A > B THEN PRINT \"A is Greater\"";
+        var code = "10 FOR A = 1 TO 5\n20 PRINT A\n30 NEXT A";
 
         interpreter.Load(code);
 

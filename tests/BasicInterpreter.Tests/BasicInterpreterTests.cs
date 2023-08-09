@@ -426,6 +426,20 @@ namespace JesseFreeman.BasicInterpreter.Tests
             Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
         }
 
+        [Theory]
+        [InlineData("10 FOR A = 1 TO 5\n20 PRINT A\n30 NEXT A", "1\n2\n3\n4\n5\n")] // Basic FOR loop
+        [InlineData("10 FOR A = 1 TO 5 STEP 2\n20 PRINT A\n30 NEXT A", "1\n3\n5\n")] // FOR loop with step
+        [InlineData("10 FOR A = 5 TO 1 STEP -1\n20 PRINT A\n30 NEXT A", "5\n4\n3\n2\n1\n")] // FOR loop with negative step
+        //[InlineData("10 FOR A = 1 TO 3\n20 FOR B = 1 TO 2\n30 PRINT A, B\n40 NEXT B\n50 NEXT A", "1 1\n1 2\n2 1\n2 2\n3 1\n3 2\n")] // Nested FOR loop TODO needs to be added back in when comma seporated statements is supported
+        public void TestForNextOutput(string script, string expectedOutput)
+        {
+            interpreter.MaxIterations = 100;
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
+        }
+
+
 
         // Continue with other unary operations...
 
