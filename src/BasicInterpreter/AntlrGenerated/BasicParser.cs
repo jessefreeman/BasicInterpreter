@@ -1353,8 +1353,8 @@ public partial class BasicParser : Parser {
 
 	public partial class Printstmt1Context : ParserRuleContext {
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode PRINT() { return GetToken(BasicParser.PRINT, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ExpressionContext expression() {
-			return GetRuleContext<ExpressionContext>(0);
+		[System.Diagnostics.DebuggerNonUserCode] public ExprlistContext exprlist() {
+			return GetRuleContext<ExprlistContext>(0);
 		}
 		public Printstmt1Context(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -1394,7 +1394,7 @@ public partial class BasicParser : Parser {
 			case 1:
 				{
 				State = 319;
-				expression();
+				exprlist();
 				}
 				break;
 			}
@@ -7875,8 +7875,8 @@ public partial class BasicParser : Parser {
 		1,0,0,0,306,303,1,0,0,0,306,304,1,0,0,0,306,305,1,0,0,0,307,11,1,0,0,0,
 		308,315,3,134,67,0,309,310,5,16,0,0,310,311,3,142,71,0,311,312,5,17,0,
 		0,312,314,1,0,0,0,313,309,1,0,0,0,314,317,1,0,0,0,315,313,1,0,0,0,315,
-		316,1,0,0,0,316,13,1,0,0,0,317,315,1,0,0,0,318,320,5,4,0,0,319,321,3,132,
-		66,0,320,319,1,0,0,0,320,321,1,0,0,0,321,15,1,0,0,0,322,323,5,106,0,0,
+		316,1,0,0,0,316,13,1,0,0,0,317,315,1,0,0,0,318,320,5,4,0,0,319,321,3,142,
+		71,0,320,319,1,0,0,0,320,321,1,0,0,0,321,15,1,0,0,0,322,323,5,106,0,0,
 		323,324,3,142,71,0,324,17,1,0,0,0,325,327,5,31,0,0,326,325,1,0,0,0,326,
 		327,1,0,0,0,327,328,1,0,0,0,328,329,3,20,10,0,329,19,1,0,0,0,330,331,3,
 		12,6,0,331,332,5,32,0,0,332,333,3,142,71,0,333,21,1,0,0,0,334,349,5,23,

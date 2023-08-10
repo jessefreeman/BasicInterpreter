@@ -22,6 +22,7 @@ namespace JesseFreeman.BasicInterpreter.Evaluators
             }
             else
             {
+                // return 0; // Return 0 for undefined variables
                 throw new VariableNotDefinedException($"Variable '{_variableName}' is not defined.");
             }
         }

@@ -25,12 +25,23 @@ namespace JesseFreeman.BasicInterpreter.Commands
             double endValue = (double)endExpression.Evaluate();
             double stepValue = stepExpression != null ? (double)stepExpression.Evaluate() : 1;
 
+            // Check if the loop should be skipped
+            if ((stepValue > 0 && startValue > endValue) || (stepValue < 0 && startValue < endValue))
+            {
+                // Set the variable to 0 and skip the loop
+                interpreter.SetVariable(variableName, 0);
+                return;
+            }
+
+            // Set the variable to its start value if the loop is not skipped
             interpreter.SetVariable(variableName, startValue);
 
-            int lineNumber = interpreter.CurrentLineNumber; // Retrieve the current line number
-            int position = interpreter.CurrentPosition; // Retrieve the current position within the line
+            int lineNumber = interpreter.CurrentLineNumber;
+            int position = interpreter.CurrentPosition;
 
             interpreter.PushLoopContext(new LoopContext(variableName, endValue, stepValue, interpreter.CurrentCommandIndex, lineNumber, position));
         }
+
     }
+
 }

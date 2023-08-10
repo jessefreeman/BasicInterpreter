@@ -185,5 +185,19 @@ namespace JesseFreeman.BasicInterpreter
             }
         }
 
+        public void JumpToNextStatement(string variableName)
+        {
+            // Find the corresponding NEXT command for the given variable
+            for (int i = currentCommandIndex + 1; i < commands.Count; i++)
+            {
+                if (commands[i].command is NextCommand nextCommand && nextCommand.VariableName == variableName)
+                {
+                    currentCommandIndex = i; // Set the current command index to the NEXT command
+                    return;
+                }
+            }
+            throw new InvalidOperationException($"No NEXT statement found for variable: {variableName}");
+        }
+
     }
 }

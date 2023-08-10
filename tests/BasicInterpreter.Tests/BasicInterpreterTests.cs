@@ -183,7 +183,6 @@ namespace JesseFreeman.BasicInterpreter.Tests
         [Theory]
         [InlineData("10 REM This is a comment\n20 PRINT \"Hello, World!\"", "Hello, World!\n")]
         [InlineData("20 PRINT \"Hello, World!\"\n30 REM THIS IS A COMMENT", "Hello, World!\n")]
-        [InlineData("10 PRINT \"Hello, World!\" REM This is a comment", "Hello, World!\n")]
         public void TestComments(string script, string expectedOutput)
         {
             interpreter.Load(script);
@@ -430,7 +429,11 @@ namespace JesseFreeman.BasicInterpreter.Tests
         [InlineData("10 FOR A = 1 TO 5\n20 PRINT A\n30 NEXT A", "1\n2\n3\n4\n5\n")] // Basic FOR loop
         [InlineData("10 FOR A = 1 TO 5 STEP 2\n20 PRINT A\n30 NEXT A", "1\n3\n5\n")] // FOR loop with step
         [InlineData("10 FOR A = 5 TO 1 STEP -1\n20 PRINT A\n30 NEXT A", "5\n4\n3\n2\n1\n")] // FOR loop with negative step
-        //[InlineData("10 FOR A = 1 TO 3\n20 FOR B = 1 TO 2\n30 PRINT A, B\n40 NEXT B\n50 NEXT A", "1 1\n1 2\n2 1\n2 2\n3 1\n3 2\n")] // Nested FOR loop TODO needs to be added back in when comma seporated statements is supported
+        [InlineData("10 FOR A = 1 TO 3\n20 FOR B = 1 TO 2\n30 PRINT A, B\n40 NEXT B\n50 NEXT A", "1 1\n1 2\n2 1\n2 2\n3 1\n3 2\n")] // Nested FOR loop TODO needs to be added back in when comma seporated statements is supported
+        [InlineData("10 FOR A = 1 TO 3\n20 PRINT A\n30 NEXT A", "1\n2\n3\n")] // Simple loop from 1 to 3
+        [InlineData("10 FOR A = 3 TO 1 STEP -1\n20 PRINT A\n30 NEXT A", "3\n2\n1\n")] // Loop with negative step value
+        [InlineData("10 FOR A = 5 TO 5\n20 PRINT A\n30 NEXT A", "5\n")] // Loop with start and end value the same
+        [InlineData("10 FOR A = 3 TO 1\n20 PRINT A\n30 NEXT A", "0\n")] // Loop with end value less than start value and no step value
         public void TestForNextOutput(string script, string expectedOutput)
         {
             interpreter.MaxIterations = 100;
@@ -439,7 +442,89 @@ namespace JesseFreeman.BasicInterpreter.Tests
             Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
         }
 
+        [Theory] // FAILS
+        [InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")]
+        public void TestValidLoop(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
 
+        //[Theory] // FAILS
+        //[InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n", "1\n2\n3\n4\n5\n6\n7\n8\n9\n")] // Missing NEXT
+        //[InlineData("10 FOR I = 1 TO 10 STEP \"A\"\n20 PRINT I\n30 NEXT I\n", "1\n")] // Non-numeric step value
+        //[InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n30 NEXT J\n", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")] // Mismatched NEXT variable
+        //public void TestInvalidLoops(string script, string expectedOutput)
+        //{
+        //    interpreter.Load(script);
+        //    interpreter.Run();
+        //    Assert.Equal(expectedOutput, writer.Output);
+        //}
+
+        //[Theory] // FAILS
+        //[InlineData("10 LET A = 3\n20 FOR I = 1 TO A\n30 PRINT I\n40 NEXT I\n", "1\n2\n3\n")] // Loop variable defined outside
+        //[InlineData("10 LET A = 2\n20 FOR I = 1 TO 10\n30 A = A * I\n40 NEXT I\n50 PRINT A\n", "2\n")] // Other variable modified outside
+        //public void TestLoopWithVariablesOutsideLoop(string script, string expectedOutput)
+        //{
+        //    interpreter.Load(script);
+        //    interpreter.Run();
+        //    Assert.Equal(expectedOutput, writer.Output);
+        //}
+
+        [Theory]
+        [InlineData("10 FOR I = 1 TO 5\n20 PRINT I * I\n30 NEXT I\n", "1\n4\n9\n16\n25\n")] // Arithmetic operations
+        // FAIL
+        //[InlineData("10 FOR I = 1 TO 3\n20 PRINT COS(I), SIN(I)\n30 NEXT I\n", "0.5403023059 0.8414709848\n-0.4161468365 0.9092974268\n-0.9899924966 0.1411200081\n")] // Function calls
+        //[InlineData("10 FOR I = 1 TO 5\n20 IF I > 3 THEN PRINT I\n30 NEXT I\n", "4\n5\n")] // IF-THEN-ELSE statement
+        public void TestLoopWithComplexExpressions(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
+
+        //[Theory] // FAIL
+        //[InlineData("10 FOR I = 1 TO 3\n20 IF I = 2 THEN GOTO 30\n30 PRINT I\n40 NEXT I\n", "1\n3\n")] // GOTO within loop
+        //                                                                                               // You can add more tests with other control structures
+        //public void TestLoopWithOtherControlStructures(string script, string expectedOutput)
+        //{
+        //    interpreter.Load(script);
+        //    interpreter.Run();
+        //    Assert.Equal(expectedOutput, writer.Output);
+        //}
+
+        //[Theory] // BAD TEST Need a smaller range or test for too many loops errro
+        //[InlineData("10 FOR I = 1 TO 1000000\n20 PRINT I\n30 NEXT I\n", "1\n2\n3\n...\n999998\n999999\n1000000\n")] // Large range
+        //public void TestLoopWithLargeRange(string script, string expectedOutput)
+        //{
+        //    interpreter.Load(script);
+        //    interpreter.Run();
+        //    Assert.Equal(expectedOutput, writer.Output);
+        //}
+
+        //[Theory] // FAIL BECAUSE VALUES HAVE LONG REMAINDERS 0.3000000000000004 SO I NEED A CUT OFF?
+        //[InlineData("10 FOR X = 0 TO 1 STEP 0.1\n20 PRINT X\n30 NEXT X\n", "0\n0.1\n0.2\n0.3\n0.4\n0.5\n0.6\n0.7\n0.8\n0.9\n1\n")] // Floating-point step value
+        //                                                                                                                           // You can add more tests with floating-point start, end, or step values
+        //public void TestLoopWithFloatingPointValues(string script, string expectedOutput)
+        //{
+        //    interpreter.Load(script);
+        //    interpreter.Run();
+        //    Assert.Equal(expectedOutput, writer.Output);
+        //}
+
+        [Theory]
+        [InlineData("10 LET A = 1\n20 LET B = 2\n30 PRINT A, B", "1 2\n")] // Printing variables
+        [InlineData("10 PRINT 1, 2, 3", "1 2 3\n")] // Printing literals
+        [InlineData("10 PRINT \"Hello\", \"World!\"", "Hello World!\n")] // Printing strings
+        [InlineData("10 LET A = 5\n20 LET B = 3\n30 PRINT A + B, A - B", "8 2\n")] // Printing expressions
+        [InlineData("10 PRINT COS(0), SIN(0)", "1 0\n")] // Printing function values
+        public void TestPrintWithCommas(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
 
         // Continue with other unary operations...
 

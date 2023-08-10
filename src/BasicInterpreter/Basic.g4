@@ -4,9 +4,6 @@ options { caseInsensitive = true; }
 prog
    : line + EOF
    ;
-// line
-//   : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
-//   ;
 line
    : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
    ;
@@ -16,11 +13,6 @@ amperoper
 linenumber
    : NUMBER
    ;
-// amprstmt
-//   : amperoper? statement
-//   | COMMENT
-//   | REM
-//   ;
 amprstmt
    : amperoper? statement (COMMA statement)*
    | COMMENT
@@ -80,8 +72,11 @@ statement
 vardecl
    : var_ (LPAREN exprlist RPAREN)*
    ;
+// printstmt1
+//   : PRINT expression?
+//   ;
 printstmt1
-   : PRINT expression?
+   : PRINT exprlist?
    ;
 getstmt
    : GET exprlist

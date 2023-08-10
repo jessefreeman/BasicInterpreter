@@ -7,42 +7,41 @@ namespace JesseFreeman.BasicInterpreter.Commands
 {
     public class PrintCommand : ICommand
     {
-        private BasicParser.ExpressionContext _expressionContext;
+        private List<BasicParser.ExpressionContext> _expressionContexts;
         private ExpressionEvaluator _expressionEvaluator;
         private IOutputWriter _writer;
 
-        public PrintCommand(BasicParser.ExpressionContext expressionContext, ExpressionEvaluator expressionEvaluator, IOutputWriter writer)
+        public PrintCommand(List<BasicParser.ExpressionContext> expressionContexts, ExpressionEvaluator expressionEvaluator, IOutputWriter writer)
         {
-            _expressionContext = expressionContext;
+            _expressionContexts = expressionContexts;
             _expressionEvaluator = expressionEvaluator;
             _writer = writer;
         }
 
         public void Execute()
         {
-            if (_expressionContext != null)
+            StringBuilder output = new StringBuilder();
+
+            foreach (var expressionContext in _expressionContexts)
             {
-                IExpression expression = _expressionEvaluator.Visit(_expressionContext);
+                IExpression expression = _expressionEvaluator.Visit(expressionContext);
                 object result = expression.Evaluate();
-                string output;
+                string value;
 
                 if (result is double number)
                 {
-                    // The result is a number, so apply the formatting logic
-                    output = FormatNumber(number);
+                    value = FormatNumber(number);
                 }
                 else
                 {
-                    // The result is not a number, so print it as is
-                    output = result.ToString();
+                    value = result.ToString();
                 }
 
-                _writer.WriteLine(output); // Write the final output string
+                output.Append(value);
+                output.Append(" "); // Separate values with spaces
             }
-            else
-            {
-                _writer.WriteLine(""); // Print a newline if no expression is provided
-            }
+
+            _writer.WriteLine(output.ToString().TrimEnd(' ')); // Write the final output string, removing trailing space
         }
 
         private string FormatNumber(double number)

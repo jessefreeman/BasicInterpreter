@@ -7,7 +7,7 @@
     /// </summary>
     public interface IOutputWriter
     {
-        void WriteLine(string line);
+        void WriteLine(string line = "");
         void Write(string text);
         void NewLine();
         string Output { get; }
