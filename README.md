@@ -173,9 +173,28 @@ Here's a brief summary of some key functions in BASIC:
 | Usr Function             | Calls a machine language subroutine.         | `PRINT USR(768)`                                     | Not needed              |
 | Ampersand Function       | Calls a machine language subroutine.         | `PRINT &A9,00`                                       | Not needed              |
 
-Please let me know if you want me to continue with the Apple Specific and Graphics/Sound Functionality table.
+### Exceptions
 
-Sure, here's a more comprehensive table of Family BASIC commands, including game controller commands, and their importance for a BASIC interpreter:
+| Error Name                         | Error Message Template                                       | Example Code to Trigger Error            | Importance   |
+| ---------------------------------- | ------------------------------------------------------------ | ---------------------------------------- | ------------ |
+| Duplicate Line Number              | "Duplicate line number at {line}"                            | `10 PRINT "HELLO"`<br>`10 PRINT "WORLD"` | Critical     |
+| Failed Predicate Parsing           | "Failed predicate parsing at {line}"                         | `IF A THEN 10`                           | Critical     |
+| GOSUB Command                      | "Undefined line number in GOSUB at {line}"                   | `GOSUB 100`                              | Critical     |
+| GOTO Command                       | "Undefined line number in GOTO at {line}"                    | `GOTO 200`                               | Critical     |
+| Input Mismatch Parsing             | "Type mismatch error at {line}"                              | `LET A = "STRING"`                       | Critical     |
+| Invalid Type Assignment            | "Invalid type assignment at {line}"                          | `LET A$ = 10`                            | Critical     |
+| Invalid Type Operation             | "Invalid type operation at {line}"                           | `LET A = "HELLO" + 10`                   | Critical     |
+| NEXT Without FOR                   | "NEXT without FOR at {line}"                                 | `NEXT I`                                 | Critical     |
+| Parsing                            | "Syntax error at {line}"                                     | `PRINT "HELLO`                           | Critical     |
+| RETURN Command                     | "RETURN without GOSUB at {line}"                             | `RETURN`                                 | Critical     |
+| Undefined Variable                 | "Undefined variable at {line}"                               | `PRINT A`                                | Critical     |
+| Unsupported Operation              | "Unsupported operation at {line}"                            | `LET A = B ^ C`                          | Critical     |
+| Variable Not Defined               | "Variable not defined at {line}"                             | `PRINT B`                                | Critical     |
+| Out of Memory                      | "Out of memory at {line}"                                    | (Exceeding available memory)             | Critical     |
+| Division by Zero                   | "Division by zero at {line}"                                 | `LET A = 10 / 0`                         | Critical     |
+| Skip Next Command (Specific)       | "Skip next command error at {line}" (Specific to your interpreter) | (Example needed from your code)          | Nice To Have |
+| Throwing Error Listener (Specific) | "Throwing error listener at {line}" (Specific to your interpreter) | (Example needed from your code)          | Nice To Have |
+| Throwing Error Strategy (Specific) | "Throwing error strategy at {line}" (Specific to your interpreter) | (Example needed from your code)          | Nice To Have |
 
 ### Family BASIC Commands
 

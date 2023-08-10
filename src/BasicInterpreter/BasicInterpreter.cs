@@ -181,6 +181,7 @@ namespace JesseFreeman.BasicInterpreter
                         return context;
                     }
                 }
+
                 throw new InvalidOperationException($"No loop context found for variable: {variableName}");
             }
         }
@@ -198,6 +199,19 @@ namespace JesseFreeman.BasicInterpreter
             }
             throw new InvalidOperationException($"No NEXT statement found for variable: {variableName}");
         }
+
+        public bool HasNextStatement(string variableName, int startIndex)
+        {
+            for (int i = startIndex + 1; i < commands.Count; i++)
+            {
+                if (commands[i].command is NextCommand nextCommand && nextCommand.VariableName == variableName)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
     }
 }

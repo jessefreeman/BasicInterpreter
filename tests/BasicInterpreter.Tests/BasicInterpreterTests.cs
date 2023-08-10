@@ -442,8 +442,8 @@ namespace JesseFreeman.BasicInterpreter.Tests
             Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
         }
 
-        [Theory] // FAILS
-        [InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")]
+        [Theory]
+        [InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n30 NEXT I\n", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")]
         public void TestValidLoop(string script, string expectedOutput)
         {
             interpreter.Load(script);
@@ -451,16 +451,73 @@ namespace JesseFreeman.BasicInterpreter.Tests
             Assert.Equal(expectedOutput, writer.Output);
         }
 
+        [Theory] // Expected to FAIL if a NEXT statement is required
+        [InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n", "1\n")]
+        public void TestMissingNextStatement(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
+
+        [Theory]
+        [InlineData("10 FOR = 1 TO 10\n20 PRINT I\n30 NEXT I\n")]
+        public void TestMissingLoopVariable(string script)
+        {
+            // Assert that loading the script throws a ParsingException
+            Assert.Throws<ParsingException>(() => {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+        }
+
+        [Theory]
+        [InlineData("10 FOR I = 1 10\n20 PRINT I\n30 NEXT I\n")]
+        public void TestMissingToKeyword(string script)
+        {
+            // Assert that loading the script throws a ParsingException
+            Assert.Throws<ParsingException>(() => {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+        }
+
+        [Theory]
+        [InlineData("10 FOR I = 1 TO 10 STEP -1\n20 PRINT I\n30 NEXT I\n", "0\n")] // Updated expected output
+        public void TestNegativeStepWithoutProperBounds(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
+
         //[Theory] // FAILS
-        //[InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n", "1\n2\n3\n4\n5\n6\n7\n8\n9\n")] // Missing NEXT
-        //[InlineData("10 FOR I = 1 TO 10 STEP \"A\"\n20 PRINT I\n30 NEXT I\n", "1\n")] // Non-numeric step value
-        //[InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n30 NEXT J\n", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")] // Mismatched NEXT variable
+        //[InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n", "1\n")] // Missing NEXT
+        ////[InlineData("10 FOR I = 1 TO 10 STEP \"A\"\n20 PRINT I\n30 NEXT I\n", "1\n")] // Non-numeric step value
+        ////[InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n30 NEXT J\n", "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")] // Mismatched NEXT variable
         //public void TestInvalidLoops(string script, string expectedOutput)
         //{
         //    interpreter.Load(script);
         //    interpreter.Run();
         //    Assert.Equal(expectedOutput, writer.Output);
         //}
+        //[Theory]
+        //[InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n30 NEXT J\n", typeof(NextWithoutForException))] // Mismatched NEXT variable
+        //public void TestInvalidLoops(string script, Type expectedExceptionType)
+        //{
+        //    interpreter.Load(script);
+        //    Exception ex = Assert.Throws(expectedExceptionType, () => interpreter.Run());
+        //    // Additional assertions on the exception, if needed
+        //}
+
+        [Theory]
+        [InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n30 NEXT J\n", typeof(NextWithoutForException))] // Mismatched NEXT variable
+        public void TestInvalidLoops(string script, Type expectedExceptionType)
+        {
+            interpreter.Load(script);
+            Exception ex = Assert.Throws(expectedExceptionType, () => interpreter.Run());
+            Assert.Equal("NEXT without FOR at line 30", ex.Message);
+        }
 
         //[Theory] // FAILS
         //[InlineData("10 LET A = 3\n20 FOR I = 1 TO A\n30 PRINT I\n40 NEXT I\n", "1\n2\n3\n")] // Loop variable defined outside

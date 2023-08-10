@@ -28,8 +28,8 @@ namespace JesseFreeman.BasicInterpreter.Commands
             // Check if the loop should be skipped
             if ((stepValue > 0 && startValue > endValue) || (stepValue < 0 && startValue < endValue))
             {
-                // Set the variable to 0 and skip the loop
-                interpreter.SetVariable(variableName, 0);
+                // Push a "skipped" loop context onto the stack
+                interpreter.PushLoopContext(new LoopContext(variableName, endValue, stepValue, interpreter.CurrentCommandIndex, interpreter.CurrentLineNumber, interpreter.CurrentPosition, shouldSkip: true));
                 return;
             }
 

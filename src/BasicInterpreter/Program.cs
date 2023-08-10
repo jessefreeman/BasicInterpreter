@@ -10,7 +10,7 @@ class Program
         var interpreter = new BasicInterpreter(writer, reader);
         //interpreter.MaxIterations = 3;
 
-        var code = "10 FOR I = 1 TO 10\n20 PRINT I\n";
+        var code = "10 FOR I = 1 TO 10\n20 PRINT I\n30 NEXT J\n";
 
         interpreter.Load(code);
 
