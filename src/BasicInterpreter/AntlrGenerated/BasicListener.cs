@@ -52,6 +52,16 @@ public interface IBasicListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitLine([NotNull] BasicParser.LineContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="BasicParser.lineWithoutNumber"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterLineWithoutNumber([NotNull] BasicParser.LineWithoutNumberContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BasicParser.lineWithoutNumber"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitLineWithoutNumber([NotNull] BasicParser.LineWithoutNumberContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="BasicParser.amperoper"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

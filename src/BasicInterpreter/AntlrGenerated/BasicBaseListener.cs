@@ -61,6 +61,18 @@ public partial class BasicBaseListener : IBasicListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLine([NotNull] BasicParser.LineContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="BasicParser.lineWithoutNumber"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterLineWithoutNumber([NotNull] BasicParser.LineWithoutNumberContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BasicParser.lineWithoutNumber"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitLineWithoutNumber([NotNull] BasicParser.LineWithoutNumberContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="BasicParser.amperoper"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

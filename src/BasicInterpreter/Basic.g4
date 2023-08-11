@@ -1,18 +1,32 @@
 ﻿grammar Basic;
 options { caseInsensitive = true; }
 
+//prog
+//   : line + EOF
+//   ;
 prog
-   : line + EOF
+   : (lineWithoutNumber? line*) EOF
+   | EOF
    ;
+// line
+//   : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
+//   ;
 line
-   : linenumber (amprstmt (COLON amprstmt?)* | COMMENT | REM)
+   : linenumber NEWLINE? (amprstmt (COLON amprstmt?)* | COMMENT | REM) NEWLINE?
    ;
+lineWithoutNumber
+  : NEWLINE? (amprstmt (COLON amprstmt?)* | COMMENT | REM) NEWLINE?
+  ;
 amperoper
    : AMPERSAND
    ;
+//linenumber
+//   : NUMBER
+//   ;
 linenumber
-   : NUMBER
+   : (WS | NEWLINE)? NUMBER
    ;
+
 amprstmt
    : amperoper? statement (COMMA statement)*
    | COMMENT
@@ -869,5 +883,9 @@ FLOAT
    ;
 
 WS
-   : [ \r\n\t] + -> channel (HIDDEN)
-   ;
+   : [ \t] + -> channel (HIDDEN)
+;
+
+NEWLINE
+  : '\r'? '\n'
+  ;

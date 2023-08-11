@@ -45,6 +45,12 @@ public interface IBasicVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitLine([NotNull] BasicParser.LineContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="BasicParser.lineWithoutNumber"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLineWithoutNumber([NotNull] BasicParser.LineWithoutNumberContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="BasicParser.amperoper"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

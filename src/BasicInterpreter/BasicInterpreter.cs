@@ -39,6 +39,12 @@ namespace JesseFreeman.BasicInterpreter
 
         public void Load(string script)
         {
+            // If the script is empty or contains only whitespace, return without doing anything
+            if (string.IsNullOrWhiteSpace(script))
+            {
+                return;
+            }
+            
             var inputStream = new AntlrInputStream(script);
             var lexer = new BasicLexer(inputStream);
             var commonTokenStream = new CommonTokenStream(lexer);
@@ -70,6 +76,7 @@ namespace JesseFreeman.BasicInterpreter
             {
                 throw new ParsingException("Syntax error in script", ex);
             }
+            
         }
 
         public void Run()

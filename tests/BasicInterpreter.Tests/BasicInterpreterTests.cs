@@ -27,8 +27,9 @@ namespace JesseFreeman.BasicInterpreter.Tests
         public void TestEmptyScript(string script)
         {
             var exception = Record.Exception(() => interpreter.Load(script));
-            Assert.IsAssignableFrom<ParsingException>(exception); // Ensure a ParsingException or any of its subclasses is thrown for empty scripts
+            Assert.Null(exception); // Ensure no exception is thrown for empty scripts
         }
+
 
         [Theory]
         [InlineData("10 PRINT \"Hello, World!\"")]
@@ -491,6 +492,16 @@ namespace JesseFreeman.BasicInterpreter.Tests
             Assert.Equal(expectedOutput, writer.Output);
         }
 
+        [Theory] // FAILS
+        [InlineData("10 LET A = 3\n20 FOR I = 1 TO A\n30 PRINT I\n40 NEXT I\n", "1\n2\n3\n")] // Loop variable defined outside
+        [InlineData("10 LET A = 2\n20 FOR I = 1 TO 10\n30 A = A * I\n40 NEXT I\n50 PRINT A\n", "7257600\n")] // Other variable modified outside
+        public void TestLoopWithVariablesOutsideLoop(string script, string expectedOutput)
+        {
+            interpreter.Load(script);
+            interpreter.Run();
+            Assert.Equal(expectedOutput, writer.Output);
+        }
+        
         //[Theory] // FAILS
         //[InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n", "1\n")] // Missing NEXT
         ////[InlineData("10 FOR I = 1 TO 10 STEP \"A\"\n20 PRINT I\n30 NEXT I\n", "1\n")] // Non-numeric step value
