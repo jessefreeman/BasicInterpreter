@@ -25,22 +25,25 @@ namespace JesseFreeman.BasicInterpreter.Commands
             double endValue = (double)endExpression.Evaluate();
             double stepValue = stepExpression != null ? (double)stepExpression.Evaluate() : 1;
 
-            // Check if the loop should be skipped
-            if ((stepValue > 0 && startValue > endValue) || (stepValue < 0 && startValue < endValue))
+            // Set the variable to its start value regardless of whether the loop will be skipped
+            interpreter.SetVariable(variableName, startValue);
+
+            // Determine if the loop should be skipped
+            bool shouldSkip = (stepValue > 0 && startValue > endValue) || (stepValue < 0 && startValue < endValue);
+
+            if (shouldSkip)
             {
                 // Push a "skipped" loop context onto the stack
                 interpreter.PushLoopContext(new LoopContext(variableName, endValue, stepValue, interpreter.CurrentCommandIndex, interpreter.CurrentLineNumber, interpreter.CurrentPosition, shouldSkip: true));
                 return;
             }
 
-            // Set the variable to its start value if the loop is not skipped
-            interpreter.SetVariable(variableName, startValue);
-
             int lineNumber = interpreter.CurrentLineNumber;
             int position = interpreter.CurrentPosition;
 
             interpreter.PushLoopContext(new LoopContext(variableName, endValue, stepValue, interpreter.CurrentCommandIndex, lineNumber, position));
         }
+
 
     }
 

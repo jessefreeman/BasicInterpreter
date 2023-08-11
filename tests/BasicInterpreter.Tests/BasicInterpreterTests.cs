@@ -433,7 +433,7 @@ namespace JesseFreeman.BasicInterpreter.Tests
         [InlineData("10 FOR A = 1 TO 3\n20 PRINT A\n30 NEXT A", "1\n2\n3\n")] // Simple loop from 1 to 3
         [InlineData("10 FOR A = 3 TO 1 STEP -1\n20 PRINT A\n30 NEXT A", "3\n2\n1\n")] // Loop with negative step value
         [InlineData("10 FOR A = 5 TO 5\n20 PRINT A\n30 NEXT A", "5\n")] // Loop with start and end value the same
-        [InlineData("10 FOR A = 3 TO 1\n20 PRINT A\n30 NEXT A", "0\n")] // Loop with end value less than start value and no step value
+        [InlineData("10 FOR A = 3 TO 1\n20 PRINT A\n30 NEXT A", "3\n")] // Loop with end value less than start value and no step value
         public void TestForNextOutput(string script, string expectedOutput)
         {
             interpreter.MaxIterations = 100;
@@ -483,7 +483,7 @@ namespace JesseFreeman.BasicInterpreter.Tests
         }
 
         [Theory]
-        [InlineData("10 FOR I = 1 TO 10 STEP -1\n20 PRINT I\n30 NEXT I\n", "0\n")] // Updated expected output
+        [InlineData("10 FOR I = 1 TO 10 STEP -1\n20 PRINT I\n30 NEXT I\n", "1\n")] // Updated expected output
         public void TestNegativeStepWithoutProperBounds(string script, string expectedOutput)
         {
             interpreter.Load(script);
