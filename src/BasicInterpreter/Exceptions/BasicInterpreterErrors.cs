@@ -2,6 +2,7 @@ namespace JesseFreeman.BasicInterpreter.Exceptions;
 
 public enum BasicInterpreterError
 {
+    DivisionByZero,
     DuplicateLineNumber,
     FailedPredicateParsing,
     GOSUBCommand,
@@ -10,11 +11,10 @@ public enum BasicInterpreterError
     InvalidTypeAssignment,
     InvalidTypeOperation,
     NEXTWithoutFOR,
+    OutOfMemory,
     Parsing,
     RETURNCommand,
     UndefinedVariable,
     UnsupportedOperation,
-    VariableNotDefined,
-    OutOfMemory,
-    DivisionByZero
+    VariableNotDefined
 }

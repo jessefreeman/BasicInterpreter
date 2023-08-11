@@ -1,4 +1,3 @@
-using System.Reflection;
 using JesseFreeman.BasicInterpreter.IO;
 
 namespace JesseFreeman.BasicInterpreter.Exceptions;
@@ -33,40 +32,16 @@ public class ExceptionManager
         _writer = writer;
     }
 
-    private string GetErrorMessageTemplate(Exception ex)
+    public void HandleException(InterpreterException ex)
     {
-        // Determine the appropriate error type based on the exception type
-        BasicInterpreterError errorType;
-        switch (ex)
-        {
-            case DuplicateLineNumberException _: errorType = BasicInterpreterError.DuplicateLineNumber; break;
-            // Add other cases for different exception types
-            // ...
-            default: throw new ArgumentException("Unknown exception type", nameof(ex));
-        }
+        // Get the error message template based on the error type
+        string errorMessageTemplate = ErrorTemplates[ex.ErrorType];
 
-        // Get the error message template from the dictionary
-        return ErrorTemplates[errorType];
-    }
-
-    public void HandleException(Exception ex)
-    {
-        // Determine the error message template based on the exception type
-        string errorMessageTemplate = GetErrorMessageTemplate(ex);
-
-        // Use reflection to iterate over the properties of the interface
-        foreach (PropertyInfo property in typeof(IBasicInterpreterState).GetProperties())
-        {
-            // Get the name and value of the property
-            string propertyName = property.Name;
-            object propertyValue = property.GetValue(_basicInterpreterState); // Fixed variable name
-
-            // Replace the token in the error message template with the property value
-            errorMessageTemplate = errorMessageTemplate.Replace($"{{{propertyName}}}", propertyValue?.ToString() ?? string.Empty);
-        }
+        // Replace the token in the error message template with the line number
+        string errorMessage = errorMessageTemplate.Replace("{line}", _basicInterpreterState.CurrentLineNumber.ToString());
 
         // Write the error message to the console using the provided writer
-        _writer.WriteLine(errorMessageTemplate);
+        _writer.WriteLine(errorMessage);
     }
 
 }
