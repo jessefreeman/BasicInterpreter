@@ -90,8 +90,8 @@ In the BASIC programming language, statements are the building blocks of the pro
 | -------------------- | ---------------------------------------- | ------------------------------------ | ------------ |
 | ~~Let Statement~~    | ~~Assigns a value to a variable.~~       | ~~`LET A = 10`~~                     | ~~Critical~~ |
 | ~~If Statement~~     | ~~Conditional execution of statements.~~ | ~~`IF A > 10 THEN PRINT "Greater"`~~ | ~~Critical~~ |
-| For Statement        | Loop with a counter.                     | `FOR I = 1 TO 10`                    | Critical     |
-| Next Statement       | Specifies the end of the For loop.       | `NEXT I`                             | Critical     |
+| ~~For Statement~~    | ~~Loop with a counter.~~                 | ~~`FOR I = 1 TO 10`~~                | ~~Critical~~ |
+| ~~Next Statement~~   | ~~Specifies the end of the For loop.~~   | ~~`NEXT I`~~                         | ~~Critical~~ |
 | Input Statement      | Reads user input.                        | `INPUT A`                            | Critical     |
 | ~~Goto Statement~~   | ~~Jumps to a line in the program.~~      | ~~`GOTO 100`~~                       | ~~Critical~~ |
 | Gosub Statement      | Calls a subroutine at a specific line.   | `GOSUB 200`                          | Critical     |
@@ -175,6 +175,12 @@ Here's a brief summary of some key functions in BASIC:
 
 ### Exceptions
 
+Errors in a BASIC interpreter are essential feedback mechanisms that inform the programmer of mistakes or issues within the code. They are crucial for debugging and ensuring that the code adheres to the syntax and semantics of the language. In the context of BASIC programming, especially in environments like C64 or Apple BASIC, errors can occur due to various reasons such as syntax mistakes, type mismatches, undefined variables, and unsupported operations.
+
+Here's a brief summary of some key errors in BASIC:
+
+Certainly! Here's the complete table including the "Not Needed" errors:
+
 | Error Name                         | Error Message Template                                       | Example Code to Trigger Error            | Importance   |
 | ---------------------------------- | ------------------------------------------------------------ | ---------------------------------------- | ------------ |
 | Duplicate Line Number              | "Duplicate line number at {line}"                            | `10 PRINT "HELLO"`<br>`10 PRINT "WORLD"` | Critical     |
@@ -195,6 +201,21 @@ Here's a brief summary of some key functions in BASIC:
 | Skip Next Command (Specific)       | "Skip next command error at {line}" (Specific to your interpreter) | (Example needed from your code)          | Nice To Have |
 | Throwing Error Listener (Specific) | "Throwing error listener at {line}" (Specific to your interpreter) | (Example needed from your code)          | Nice To Have |
 | Throwing Error Strategy (Specific) | "Throwing error strategy at {line}" (Specific to your interpreter) | (Example needed from your code)          | Nice To Have |
+| File Exceptions                    | "File error at {line}"                                       | `LOAD "FILE"`                            | Not Needed   |
+| Device Exceptions                  | "Device error at {line}"                                     | `OPEN 4,4`                               | Not Needed   |
+| Input Output File                  | "Input/output error at {line}"                               | `PRINT#1, "TEXT"`                        | Not Needed   |
+| Filename Exceptions                | "Filename error at {line}"                                   | `SAVE ""`                                | Not Needed   |
+| Break Error                        | "Break at {line}"                                            | (User presses the BREAK key)             | Not Needed   |
+| Extra Ignored                      | "Extra ignored at {line}"                                    | `PRINT "HELLO" EXTRA`                    | Not Needed   |
+| Redo from Start                    | "Redo from start at {line}"                                  | `INPUT A$` (without entering anything)   | Not Needed   |
+| How Error                          | "How?"                                                       | `PRINT 5+"HELLO"`                        | Not Needed   |
+| Load Error                         | "Load error at {line}"                                       | `LOAD "NONEXISTENT"`                     | Not Needed   |
+| Verify Error                       | "Verify error at {line}"                                     | `VERIFY "FILE"`                          | Not Needed   |
+| Direct Mode Error                  | "Direct mode error at {line}"                                | `RUN` (in direct mode)                   | Not Needed   |
+| Illegal Direct Error               | "Illegal direct error at {line}"                             | `FOR I=1 TO 10` (in direct mode)         | Not Needed   |
+| Not Available Error                | "Not available at {line}"                                    | (Specific to unavailable features)       | Not Needed   |
+
+This table includes all the errors, sorted by importance, and includes the "Not Needed" errors as well.
 
 ### Family BASIC Commands
 
@@ -258,21 +279,3 @@ Here's a brief summary:
 | Save Statement      | Saves the program to disk.                                   | `SAVE "PROGRAM.BAS"`     | Not needed |
 | Cls Statement       | Clears the screen.                                           | `CLS`                    | Not needed |
 | Include Statement   | Includes another BASIC program.                              | `INCLUDE "OTHER.BAS"`    | Not needed |
-
-Other things to do
-
-- Add unit tests for all of the errors
-  - DuplicateLineNumberException.cs
-  - FailedPredicateParsingException.cs
-  - GosubCommandException.cs
-  - GotoCommandException.cs
-  - InputMismatchParsingException.cs
-  - InvalidTypeAssignmentException.cs
-  - InvalidTypeOperationException.cs
-  - ParsingException.cs
-  - ReturnCommandException.cs
-  - ThrowingErrorListener.cs
-  - ThrowingErrorStrategy.cs
-  - UndefinedVariableException.cs
-  - UnsupportedOperationException.cs
-  - VariableNotDefinedException.cs

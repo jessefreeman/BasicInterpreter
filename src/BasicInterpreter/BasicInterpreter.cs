@@ -6,7 +6,7 @@ using JesseFreeman.BasicInterpreter.IO;
 
 namespace JesseFreeman.BasicInterpreter
 {
-    public class BasicInterpreter
+    public class BasicInterpreter : IBasicInterpreterState
     {
         private readonly BasicCommandVisitor visitor;
         private List<(int lineNumber, ICommand command)> commands;
@@ -15,8 +15,13 @@ namespace JesseFreeman.BasicInterpreter
         private int currentCommandIndex = 0;
         private int currentPosition = 0;
         private Stack<LoopContext> loopStack = new Stack<LoopContext>();
-
         public int CurrentLineNumber => commands[currentCommandIndex].lineNumber;
+
+        // Field to store the last accessed variable name
+        private string currentVariable;
+
+        public string CurrentVariable => currentVariable;
+
         public int CurrentPosition => currentPosition;
 
         public IInputReader InputReader { get; }
@@ -146,11 +151,13 @@ namespace JesseFreeman.BasicInterpreter
 
         public void SetVariable(string name, double value)
         {
+            currentVariable = name; // Store the variable name
             variables[name] = value;
         }
 
         public double GetVariable(string name)
         {
+            currentVariable = name; // Store the variable name
             return Convert.ToDouble(variables[name]);
         }
 
