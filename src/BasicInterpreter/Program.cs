@@ -12,20 +12,20 @@ class Program
         var interpreter = new BasicInterpreter(writer, reader);
         var exManager = new ExceptionManager(interpreter, writer);
 
-        var code = "10 LET A = 3\n20 FOR I = 1 TO A\n30 PRINT I\n40 NEXT I\n";
+        var code = "10 PRINT \"Hello\"\n20 PRINT \"World\"\n20 PRINT \"Again\"";
 
         try
         {
             interpreter.Load(code);
             interpreter.Run();
         }
-        catch (Exception ex)
+        catch (InterpreterException ex)
         {
             // Pass the exception to the error manager for handling
             exManager.HandleException(ex);
 
             // Rethrow the exception to allow it to propagate up the call stack
-            throw;
+            // throw;
         }
 
         

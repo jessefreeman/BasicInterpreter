@@ -5,16 +5,17 @@ public enum BasicInterpreterError
     DivisionByZero,
     DuplicateLineNumber,
     FailedPredicateParsing,
-    GOSUBCommand,
-    GOTOCommand,
-    InputMismatchParsing,
+    GoSub,
+    GoTo,
+    InputMismatch,
     InvalidTypeAssignment,
     InvalidTypeOperation,
-    NEXTWithoutFOR,
+    NextWithoutFor,
     OutOfMemory,
-    Parsing,
-    RETURNCommand,
+    ParsingError,
+    Return,
     UndefinedVariable,
     UnsupportedOperation,
     VariableNotDefined
 }
+

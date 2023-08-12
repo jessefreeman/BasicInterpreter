@@ -9,6 +9,7 @@ namespace JesseFreeman.BasicInterpreter.Tests
         private StringOutputWriter writer;
         private StringInputReader reader;
         private BasicInterpreter interpreter;
+        private readonly ExceptionManager exManager;
         private const double Tolerance = 1e-10;
 
         // This constructor will be called before each test case
@@ -17,6 +18,7 @@ namespace JesseFreeman.BasicInterpreter.Tests
             writer = new StringOutputWriter();
             reader = new StringInputReader(); // or any other suitable implementation for testing
             interpreter = new BasicInterpreter(writer, reader);
+            exManager = new ExceptionManager(interpreter, writer);
         }
 
         [Theory]
@@ -592,6 +594,146 @@ namespace JesseFreeman.BasicInterpreter.Tests
             interpreter.Load(script);
             interpreter.Run();
             Assert.Equal(expectedOutput, writer.Output);
+        }
+        
+        [Theory]
+        [InlineData("10 PRINT \"Hello\"\n10 PRINT \"World!\"", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 10")]
+        [InlineData("10 PRINT \"Hello\"\n10 LET A = 5\n10 PRINT \"World\"", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 10")]
+        [InlineData("10 FOR I = 1 TO 3\n10 PRINT \"World\"", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 10")]
+        [InlineData("10 PRINT \"Hello\"\n20 LET A = 5\n20 FOR I = 1 TO 3", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 20")]
+        [InlineData("10 PRINT \"Hello\"\n20 PRINT \"World\"\n10 LET A = 5\n20 FOR I = 1 TO 3", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 10")]
+        [InlineData("10 PRINT A\n10 LET A = 5", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 10")]
+        [InlineData("10 PRINT \"Hello\"\n20 PRINT \"World\"\n20 PRINT \"Again\"", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 20")]
+        [InlineData("10 PRINT \"A\"\n30 PRINT \"B\"\n30 PRINT \"C\"\n40 PRINT \"D\"", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 30")]
+        [InlineData("5 PRINT \"Start\"\n15 PRINT \"Middle\"\n15 PRINT \"Middle Again\"\n25 PRINT \"End\"", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 15")]
+        [InlineData("100 PRINT \"X\"\n200 PRINT \"Y\"\n100 PRINT \"Z\"", BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at 100")]
+        public void TestDuplicateLineNumberError(string script, BasicInterpreterError expectedErrorType, string expectedErrorMessage)
+        {
+            var exManager = new ExceptionManager(interpreter, writer);
+
+            Exception exception = null;
+            try
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            }
+            catch (InterpreterException ex)
+            {
+                exception = ex;
+                exManager.HandleException(ex);
+            }
+
+            Assert.NotNull(exception);
+            Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(expectedErrorType, ((InterpreterException)exception).ErrorType);
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim());
+        }
+
+        [Theory]
+        [InlineData("10 PRINT \"Hello\"\n20 PRINT \"World\"\n20 PRINT \"Again\"", 20)]
+        [InlineData("10 PRINT \"A\"\n30 PRINT \"B\"\n30 PRINT \"C\"\n40 PRINT \"D\"", 30)]
+        [InlineData("5 PRINT \"Start\"\n15 PRINT \"Middle\"\n15 PRINT \"Middle Again\"\n25 PRINT \"End\"", 15)]
+        [InlineData("100 PRINT \"X\"\n200 PRINT \"Y\"\n100 PRINT \"Z\"", 100)]
+        public void TestDuplicateLineNumberNotFirstLine(string script, int expectedDuplicateLineNumber)
+        {
+            
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.DuplicateLineNumber, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.DuplicateLineNumber];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedDuplicateLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim()); // Ensure the output is as expected
+        }
+
+        [Theory]
+        [InlineData("10 PRINT \"Hello\"\n20 LET A = 5\n10 PRINT \"World\"", 10)]
+        [InlineData("10 PRINT \"A\"\n20 FOR I = 1 TO 3\n30 PRINT \"B\"\n20 PRINT \"C\"", 20)]
+        [InlineData("10 PRINT \"X\"\n20 LET B = 10\n30 FOR I = 1 TO 3\n20 PRINT \"Y\"", 20)]
+        public void TestDuplicateLineNumbersWithDifferentCommands(string script, int expectedDuplicateLineNumber)
+        {
+            
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.DuplicateLineNumber, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.DuplicateLineNumber];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedDuplicateLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim()); // Ensure the output is as expected
+
+        }
+        
+        [Theory]
+        [InlineData("10 PRINT \"Start\"\n20 PRINT \"A\"\n10 PRINT \"Duplicate at beginning\"\n30 PRINT \"B\"", 10)]
+        [InlineData("10 PRINT \"A\"\n20 PRINT \"B\"\n30 PRINT \"C\"\n30 PRINT \"Duplicate in middle\"\n40 PRINT \"D\"", 30)]
+        [InlineData("10 PRINT \"X\"\n20 PRINT \"Y\"\n30 PRINT \"Z\"\n40 PRINT \"A\"\n100 PRINT \"B\"\n100 PRINT \"Duplicate at end\"", 100)]
+        public void TestDuplicateLineNumbersInDifferentParts(string script, int expectedDuplicateLineNumber)
+        {
+            
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.DuplicateLineNumber, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.DuplicateLineNumber];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedDuplicateLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim()); // Ensure the output is as expected
+
+        }
+
+        [Theory]
+        [InlineData("10 FOR I = 1 TO 3\n20 FOR J = 1 TO 3\n30 PRINT \"A\"\n20 PRINT \"Duplicate in nested loop\"", 20)]
+        [InlineData("10 PRINT \"Start\"\n20 FOR A = 1 TO 2\n30 FOR B = 1 TO 2\n40 FOR C = 1 TO 2\n50 PRINT \"Nested\"\n50 PRINT \"Duplicate in deeply nested loop\"", 50)]
+        public void TestDuplicateLineNumbersWithNestedLoops(string script, int expectedDuplicateLineNumber)
+        {
+            
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.DuplicateLineNumber, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.DuplicateLineNumber];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedDuplicateLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim()); // Ensure the output is as expected
+
         }
 
         // Continue with other unary operations...

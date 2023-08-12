@@ -15,8 +15,9 @@ namespace JesseFreeman.BasicInterpreter
         private int currentCommandIndex = 0;
         private int currentPosition = 0;
         private Stack<LoopContext> loopStack = new Stack<LoopContext>();
-        public int CurrentLineNumber => commands[currentCommandIndex].lineNumber;
+        public int CurrentLineNumber => currentLineNumber;
 
+        private int currentLineNumber = 0;
         // Field to store the last accessed variable name
         private string currentVariable;
 
@@ -64,15 +65,15 @@ namespace JesseFreeman.BasicInterpreter
 
                 foreach (BasicParser.LineContext line in tree.line())
                 {
-                    int lineNumber = int.Parse(line.linenumber().GetText());
+                    currentLineNumber = int.Parse(line.linenumber().GetText());
                     ICommand command = visitor.Visit(line);
                     if (command != null) // Check if the command is not null
                     {
-                        if (commands.Any(cmd => cmd.lineNumber == lineNumber))
+                        if (commands.Any(cmd => cmd.lineNumber == currentLineNumber))
                         {
-                            throw new DuplicateLineNumberException(lineNumber);
+                            throw new InterpreterException(BasicInterpreterError.DuplicateLineNumber);
                         }
-                        commands.Add((lineNumber, command));
+                        commands.Add((currentLineNumber, command));
                     }
                 }
                 commands.Sort((cmd1, cmd2) => cmd1.lineNumber.CompareTo(cmd2.lineNumber));
@@ -87,12 +88,16 @@ namespace JesseFreeman.BasicInterpreter
         public void Run()
         {
             currentCommandIndex = 0;
+            currentLineNumber = 0; // Reset the current line number
             hasEnded = false;
             int iterationCount = 0;
 
             while (currentCommandIndex < commands.Count)
             {
+                currentLineNumber = commands[currentCommandIndex].lineNumber; // Update the current line number
+
                 iterationCount++;
+
                 if (iterationCount > MaxIterations)
                 {
                     throw new InvalidOperationException("Maximum number of iterations exceeded");
