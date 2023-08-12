@@ -12,7 +12,7 @@ class Program
         var interpreter = new BasicInterpreter(writer, reader);
         var exManager = new ExceptionManager(interpreter, writer);
 
-        var code = "10 PRINT \"Hello\"\n20 PRINT \"World\"\n20 PRINT \"Again\"";
+        var code = "10 FOR I = 1 TO 10\n20 PRINT I\n30 NEXT\n";
 
         try
         {

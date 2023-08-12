@@ -4,10 +4,10 @@ public enum BasicInterpreterError
 {
     DivisionByZero,
     DuplicateLineNumber,
-    FailedPredicateParsing,
+    // FailedPredicateParsing,
     GoSub,
     GoTo,
-    InputMismatch,
+    // InputMismatch,
     InvalidTypeAssignment,
     InvalidTypeOperation,
     NextWithoutFor,

@@ -1,26 +1,41 @@
 ﻿using Antlr4.Runtime;
 
-namespace JesseFreeman.BasicInterpreter.Exceptions
+namespace JesseFreeman.BasicInterpreter.Exceptions;
+
+public class ThrowingErrorStrategy : DefaultErrorStrategy
 {
-    public class ThrowingErrorStrategy : DefaultErrorStrategy
+    private readonly BasicInterpreter _interpreter;
+
+    // private readonly Dictionary<int, int> physicalToBasicLineNumbers;
+
+    public ThrowingErrorStrategy(BasicInterpreter interpreter)
     {
-        public override void Recover(Parser recognizer, RecognitionException e)
-        {
-            throw new ParsingException("Failed to recover from a parsing error", e);
-        }
-
-        protected override void ReportInputMismatch(Parser recognizer, InputMismatchException e)
-        {
-            throw new InputMismatchParsingException("Input mismatch error", e);
-        }
-
-        protected override void ReportFailedPredicate(Parser recognizer, FailedPredicateException e)
-        {
-            throw new FailedPredicateParsingException("Failed predicate error", e);
-        }
-
-        // Override any other methods as needed...
+        _interpreter = interpreter;
+    }
+    
+    public override void Recover(Parser recognizer, RecognitionException e)
+    {
+        int physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
+        _interpreter.SetCurrentLineNumber(_interpreter.PhysicalToBasicLineNumbers[physicalLineNumber]);
+        throw new InterpreterException(BasicInterpreterError.ParsingError);
     }
 
+    protected override void ReportInputMismatch(Parser recognizer, InputMismatchException e)
+    {
+        int physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
+        _interpreter.SetCurrentLineNumber(_interpreter.PhysicalToBasicLineNumbers[physicalLineNumber]);
+        throw new InterpreterException(BasicInterpreterError.ParsingError);
+    }
+
+    protected override void ReportFailedPredicate(Parser recognizer, FailedPredicateException e)
+    {
+        int physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
+        _interpreter.SetCurrentLineNumber(_interpreter.PhysicalToBasicLineNumbers[physicalLineNumber]);
+        throw new InterpreterException(BasicInterpreterError.ParsingError);
+    }
+
+    // Override any other methods as needed...
 }
+
+
 

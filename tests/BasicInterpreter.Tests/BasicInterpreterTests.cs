@@ -63,9 +63,10 @@ namespace JesseFreeman.BasicInterpreter.Tests
         {
             interpreter.Load(script);
             var exception = Record.Exception(() => interpreter.Run());
-            Assert.IsAssignableFrom<VariableNotDefinedException>(exception); // Ensure a VariableNotDefinedException is thrown for undefined variables
-        }
 
+            var interpreterException = Assert.IsType<InterpreterException>(exception); // Ensure an InterpreterException is thrown for undefined variables
+            Assert.Equal(BasicInterpreterError.VariableNotDefined, interpreterException.ErrorType); // Ensure the error type is VariableNotDefined
+        }
 
 
         [Theory]
@@ -467,24 +468,26 @@ namespace JesseFreeman.BasicInterpreter.Tests
         [InlineData("10 FOR = 1 TO 10\n20 PRINT I\n30 NEXT I\n")]
         public void TestMissingLoopVariable(string script)
         {
-            // Assert that loading the script throws a ParsingException
-            Assert.Throws<ParsingException>(() => {
+            // Assert that loading the script throws an InterpreterException with ParsingError
+            var exception = Assert.Throws<InterpreterException>(() => {
                 interpreter.Load(script);
                 interpreter.Run();
             });
+            Assert.Equal(BasicInterpreterError.ParsingError, exception.ErrorType);
         }
 
         [Theory]
         [InlineData("10 FOR I = 1 10\n20 PRINT I\n30 NEXT I\n")]
         public void TestMissingToKeyword(string script)
         {
-            // Assert that loading the script throws a ParsingException
-            Assert.Throws<ParsingException>(() => {
+            // Assert that loading the script throws an InterpreterException with ParsingError
+            var exception = Assert.Throws<InterpreterException>(() => {
                 interpreter.Load(script);
                 interpreter.Run();
             });
+            Assert.Equal(BasicInterpreterError.ParsingError, exception.ErrorType);
         }
-
+        
         [Theory]
         [InlineData("10 FOR I = 1 TO 10 STEP -1\n20 PRINT I\n30 NEXT I\n", "1\n")] // Updated expected output
         public void TestNegativeStepWithoutProperBounds(string script, string expectedOutput)
@@ -493,6 +496,139 @@ namespace JesseFreeman.BasicInterpreter.Tests
             interpreter.Run();
             Assert.Equal(expectedOutput, writer.Output);
         }
+        
+        [Theory]
+        [InlineData("10 FOR I = TO 10\n20 PRINT I\n30 NEXT I\n", 10)] // Missing value in FOR
+        [InlineData("10 FOR I = 1 TO\n20 PRINT I\n30 NEXT I\n", 10)] // Missing value in FOR
+        [InlineData("10 FOR I = 1 TO 10, J = 2 TO\n20 PRINT I, J\n30 NEXT I, J\n", 10)] // Missing value in multiple FOR
+        [InlineData("10 PRINT \"Start\" FOR I = 1 TO 10\n20 PRINT I\n30 NEXT I\n", 10)] // Missing colon between commands
+        public void TestParsingException(string script, int expectedErrorLineNumber)
+        {
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.ParsingError, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.ParsingError];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedErrorLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim()); // Ensure the output is as expected
+        }
+        
+        [Theory]
+        [InlineData("10 FOR I = 1 TO 10: PRINT I: LET X = 5: LET Y =\n20 PRINT I\n30 NEXT I\n", 10)] // Multiple commands, missing value in LET
+        [InlineData("10 PRINT \"Start\": FOR I = 1 TO 10: PRINT \"Loop\": LET X =\n20 PRINT I\n30 NEXT I\n", 10)] // Multiple commands, missing value in LET
+        [InlineData("10 PRINT \"Start\": FOR I = 1 TO: PRINT \"Loop\": LET X = 5\n20 PRINT I\n30 NEXT I\n", 10)] // Multiple commands, missing value in FOR
+        [InlineData("10 PRINT \"Start\": FOR I = 1 TO 10: PRINT \"Loop\": LET X = 5: LET Y\n20 PRINT I\n30 NEXT I\n", 10)] // Multiple commands, LET without value
+        public void TestParsingExceptionWithMultipleCommands(string script, int expectedErrorLineNumber)
+        {
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.ParsingError, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.ParsingError];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedErrorLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim());
+        }
+
+        
+        [Theory]
+        [InlineData("10 PRINT A\n", 10)] // Using an undefined variable
+        [InlineData("10 LET X = A + 1\n20 PRINT X\n", 10)] // Using an undefined variable in an expression
+        [InlineData("10 FOR I = 1 TO 10\n20 PRINT J\n30 NEXT I\n", 20)] // Using an undefined variable inside a loop
+        public void TestVariableErrors(string script, int expectedErrorLineNumber)
+        {
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.VariableNotDefined, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.VariableNotDefined];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedErrorLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim());
+        }
+
+        [Theory]
+        [InlineData("10 FOR I = 1 TO 10\n20 FOR J = 1 TO 10\n30 NEXT J\n40 NEXT I\n", 20)] // Nested loops
+        [InlineData("10 FOR I = 1 TO 10\n20 NEXT J\n30 NEXT I\n", 20)] // Incorrect variable in NEXT
+        [InlineData("10 FOR I = 1 TO 10\n20 PRINT I, J\n30 NEXT I, I\n", 30)] // Repeated variable in NEXT
+        public void TestLoopErrors(string script, int expectedErrorLineNumber)
+        {
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.NextWithoutFor, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.NextWithoutFor];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedErrorLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim());
+        }
+        
+        [Theory]
+        [InlineData("10 LET X\n20 PRINT X\n", 10)] // LET without value
+        [InlineData("10 PRINT A$", 10)] // Test undefined variable
+        [InlineData("10 LET A$ = 123\n20 PRINT A$", 10)] // Test setting a number to a string variable
+        [InlineData("10 LET A = \"Hello\"\n20 PRINT A", 10)] // Test setting a string to a number variable
+        [InlineData("10 LET A$ = \"Hello\"\n20 PRINT A$\n30 LET A$ = 123\n40 PRINT A$", 30)] // Test resetting a string variable to a number
+        [InlineData("10 LET A = 123\n20 PRINT A\n30 LET A = \"Hello\"\n40 PRINT A", 30)] // Test resetting a number variable to a string
+        [InlineData("10 FOR $I = 1 TO 10\n20 PRINT I\n30 NEXT I\n", 10)] // Invalid variable name
+        public void TestLetStatementErrors(string script, int expectedErrorLineNumber)
+        {
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.ParsingError, interpreterException.ErrorType); // Assuming ParsingError is the correct error type for this case
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.ParsingError];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedErrorLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim()); // Ensure the output is as expected
+        }
+
 
         [Theory] // FAILS
         [InlineData("10 LET A = 3\n20 FOR I = 1 TO A\n30 PRINT I\n40 NEXT I\n", "1\n2\n3\n")] // Loop variable defined outside
@@ -735,6 +871,36 @@ namespace JesseFreeman.BasicInterpreter.Tests
             Assert.Equal(expectedErrorMessage, writer.Output.Trim()); // Ensure the output is as expected
 
         }
+        
+        [Theory]
+        [InlineData("10 LET A = 10 / 0", 10)]
+        [InlineData("10 LET B = 0\n20 LET A = 10 / B", 20)]
+        [InlineData("10 LET B = 5 - 5\n20 LET A = 10 / B", 20)]
+        [InlineData("10 LET B = (3 - 3) * 2\n20 LET A = 10 / B", 20)]
+        [InlineData("10 LET B = 0\n20 LET C = 0\n30 LET A = B / C", 30)]
+        [InlineData("10 FOR I = 1 TO 2\n20 LET B = 0\n30 LET A = 10 / B\n40 NEXT I", 30)]
+        public void TestDivisionByZeroError(string script, int expectedErrorLineNumber)
+        {
+            var exManager = new ExceptionManager(interpreter, writer);
+
+            var exception = Record.Exception(() =>
+            {
+                interpreter.Load(script);
+                interpreter.Run();
+            });
+
+            var interpreterException = Assert.IsType<InterpreterException>(exception);
+            Assert.Equal(BasicInterpreterError.DivisionByZero, interpreterException.ErrorType);
+
+            // Handle the exception using the ExceptionManager
+            exManager.HandleException(interpreterException);
+
+            // Use the template from ExceptionManager
+            string errorMessageTemplate = ExceptionManager.ErrorTemplates[BasicInterpreterError.DivisionByZero];
+            string expectedErrorMessage = errorMessageTemplate.Replace("{line}", expectedErrorLineNumber.ToString());
+
+            Assert.Equal(expectedErrorMessage, writer.Output.Trim()); // Ensure the output is as expected
+        }
 
         // Continue with other unary operations...
 
@@ -841,7 +1007,6 @@ namespace JesseFreeman.BasicInterpreter.Tests
         [InlineData(0, 1, 0.0)] // 0 / 1 = 0.0
         [InlineData(double.PositiveInfinity, 2, double.PositiveInfinity)] // Infinity / 2 = Infinity
         [InlineData(double.NegativeInfinity, -3, double.PositiveInfinity)] // -Infinity / -3 = Infinity
-        [InlineData(3.2, 0, double.PositiveInfinity)] // 3.2 / 0 = Infinity
         [InlineData(double.NaN, 2, double.NaN)] // NaN / 2 = NaN
         [InlineData(double.NaN, double.NaN, double.NaN)] // NaN / NaN = NaN
         public void TestDivisionExpression(object left, object right, double expectedResult)
@@ -850,18 +1015,21 @@ namespace JesseFreeman.BasicInterpreter.Tests
             var divisionExpression = new DivisionExpression();
 
             // Act
-            object result;
-            try
-            {
-                result = (double)divisionExpression.Evaluate(left, right);
-            }
-            catch (DivideByZeroException)
-            {
-                result = double.PositiveInfinity; // Set the result to positive infinity for the division by zero case.
-            }
+            var result = (double)divisionExpression.Evaluate(left, right);
 
             // Assert
             Assert.InRange((double)result, expectedResult - Tolerance, expectedResult + Tolerance);
+        }
+        
+        [Theory]
+        [InlineData(3.2, 0)]
+        public void TestDivisionByZeroException(double left, double right)
+        {
+            var divisionExpression = new DivisionExpression();
+
+            // Expect an InterpreterException with the DivisionByZero error type
+            var exception = Assert.Throws<InterpreterException>(() => divisionExpression.Evaluate(left, right));
+            Assert.Equal(BasicInterpreterError.DivisionByZero, exception.ErrorType);
         }
 
         [Theory]

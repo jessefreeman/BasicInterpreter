@@ -8,10 +8,10 @@ public class ExceptionManager
     {
         { BasicInterpreterError.DivisionByZero, "Division by zero at {line}" },
         { BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at {line}" },
-        { BasicInterpreterError.FailedPredicateParsing, "Failed predicate parsing at {line}" },
+        // { BasicInterpreterError.FailedPredicateParsing, "Failed predicate parsing at {line}" },
         { BasicInterpreterError.GoSub, "Undefined line number in GOSUB at {line}" },
         { BasicInterpreterError.GoTo, "Undefined line number in GOTO at {line}" },
-        { BasicInterpreterError.InputMismatch, "Type mismatch error at {line}" },
+        // { BasicInterpreterError.InputMismatch, "Type mismatch error at {line}" },
         { BasicInterpreterError.InvalidTypeAssignment, "Invalid type assignment at {line}" },
         { BasicInterpreterError.InvalidTypeOperation, "Invalid type operation at {line}" },
         { BasicInterpreterError.NextWithoutFor, "NEXT without FOR at {line}" },

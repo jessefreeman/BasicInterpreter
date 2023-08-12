@@ -1,32 +1,30 @@
 ﻿using System;
 using JesseFreeman.BasicInterpreter.Exceptions;
 
-namespace JesseFreeman.BasicInterpreter.Evaluators
+namespace JesseFreeman.BasicInterpreter.Evaluators;
+public class VariableExpression : IExpression
 {
-    public class VariableExpression : IExpression
+    private string _variableName;
+    private Dictionary<string, object> _variables;
+
+    public VariableExpression(string variableName, Dictionary<string, object> variables)
     {
-        private string _variableName;
-        private Dictionary<string, object> _variables;
+        _variableName = variableName;
+        _variables = variables;
+    }
 
-        public VariableExpression(string variableName, Dictionary<string, object> variables)
+    public object Evaluate(params object[] operands)
+    {
+        if (_variables.TryGetValue(_variableName, out var value))
         {
-            _variableName = variableName;
-            _variables = variables;
+            return value;
         }
-
-        public object Evaluate(params object[] operands)
+        else
         {
-            if (_variables.TryGetValue(_variableName, out var value))
-            {
-                return value;
-            }
-            else
-            {
-                // return 0; // Return 0 for undefined variables
-                throw new VariableNotDefinedException($"Variable '{_variableName}' is not defined.");
-            }
+            throw new InterpreterException(BasicInterpreterError.VariableNotDefined);
         }
-
     }
 }
+
+
 
