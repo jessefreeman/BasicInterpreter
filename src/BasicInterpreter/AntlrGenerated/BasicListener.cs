@@ -152,6 +152,16 @@ public interface IBasicListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitVariableassignment([NotNull] BasicParser.VariableassignmentContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="BasicParser.stringVarDecl"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterStringVarDecl([NotNull] BasicParser.StringVarDeclContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BasicParser.stringVarDecl"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitStringVarDecl([NotNull] BasicParser.StringVarDeclContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="BasicParser.relop"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

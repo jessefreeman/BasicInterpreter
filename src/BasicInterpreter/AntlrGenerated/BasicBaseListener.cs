@@ -181,6 +181,18 @@ public partial class BasicBaseListener : IBasicListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitVariableassignment([NotNull] BasicParser.VariableassignmentContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="BasicParser.stringVarDecl"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterStringVarDecl([NotNull] BasicParser.StringVarDeclContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="BasicParser.stringVarDecl"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitStringVarDecl([NotNull] BasicParser.StringVarDeclContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="BasicParser.relop"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

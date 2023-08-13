@@ -105,6 +105,12 @@ public interface IBasicVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitVariableassignment([NotNull] BasicParser.VariableassignmentContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="BasicParser.stringVarDecl"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitStringVarDecl([NotNull] BasicParser.StringVarDeclContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="BasicParser.relop"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

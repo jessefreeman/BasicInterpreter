@@ -98,8 +98,15 @@ getstmt
 letstmt
    : LET? variableassignment
    ;
+// variableassignment
+//   : vardecl EQ exprlist
+//   ;
 variableassignment
-   : vardecl EQ exprlist
+   : stringVarDecl EQ exprlist // For string variables
+   | vardecl EQ exprlist      // For numeric variables
+   ;
+stringVarDecl
+   : var_ DOLLAR
    ;
 relop
    : GTE

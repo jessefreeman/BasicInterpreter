@@ -4,6 +4,7 @@ using Antlr4.Runtime.Tree;
 using Jessefreeman.BasicInterpreter.Commands;
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using JesseFreeman.BasicInterpreter.Evaluators;
+using JesseFreeman.BasicInterpreter.Exceptions;
 using JesseFreeman.BasicInterpreter.IO;
 
 namespace JesseFreeman.BasicInterpreter.Commands;
@@ -83,8 +84,24 @@ public class BasicCommandVisitor : BasicBaseVisitor<ICommand>
 
     public override ICommand VisitLetstmt(BasicParser.LetstmtContext context)
     {
-        string variableName = context.variableassignment().vardecl().var_().GetText();
-        var expressionContext = context.variableassignment().exprlist().expression(0);
+        var variableAssignment = context.variableassignment();
+        string variableName;
+        var expressionContext = variableAssignment.exprlist().expression(0);
+
+        if (variableAssignment.vardecl() != null)
+        {
+            variableName = variableAssignment.vardecl().var_().GetText();
+        }
+        else if (variableAssignment.stringVarDecl() != null)
+        {
+            variableName = variableAssignment.stringVarDecl().var_().GetText() + "$";
+        }
+        else
+        {
+            // "Neither vardecl nor stringVarDecl is matched"
+            throw new InterpreterException(BasicInterpreterError.ParsingError);
+        }
+
         return new LetCommand(variableName, expressionContext, this.expressionEvaluator, this.variables);
     }
 

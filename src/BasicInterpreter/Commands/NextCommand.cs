@@ -28,7 +28,7 @@ namespace JesseFreeman.BasicInterpreter.Commands
             catch (InvalidOperationException)
             {
                 // If no loop context is found, throw a specific exception for "NEXT without FOR"
-                throw new NextWithoutForException($"NEXT without FOR at line {interpreter.CurrentLineNumber}");
+                throw new InterpreterException(BasicInterpreterError.NextWithoutFor);
             }
 
             // Check if the loop should be skipped

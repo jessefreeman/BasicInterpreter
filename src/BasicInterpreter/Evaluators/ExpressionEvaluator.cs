@@ -111,7 +111,8 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
             }
         }
 
-        throw new UnsupportedOperationException($"Unhandled func_ alternative: {context.GetText()}");
+        throw new InterpreterException(BasicInterpreterError.UnsupportedOperation);
+        // throw new UnsupportedOperationException($"Unhandled func_ alternative: {context.GetText()}");
     }
 
     private object InvokeMethodIfExists(object obj, string methodName)
@@ -139,7 +140,9 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
             }
             else
             {
-                throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
+                throw new InterpreterException(BasicInterpreterError.UnsupportedOperation);
+
+                // throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
             }
         }
 
@@ -187,7 +190,9 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
             }
             else
             {
-                throw new UnsupportedOperationException("NOT operation not found in operations dictionary");
+                throw new InterpreterException(BasicInterpreterError.UnsupportedOperation);
+
+                // throw new UnsupportedOperationException("NOT operation not found in operations dictionary");
             }
         }
 
@@ -213,7 +218,9 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
         string operatorSymbol = context.relop().GetText();
         if (!operations.TryGetValue(operatorSymbol, out IExpression operation))
         {
-            throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
+            throw new InterpreterException(BasicInterpreterError.UnsupportedOperation);
+
+            // throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
         }
 
         return new LambdaExpression(operation, new IExpression[] { left, right });

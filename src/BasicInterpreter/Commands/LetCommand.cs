@@ -22,7 +22,25 @@ public class LetCommand : ICommand
     {
         IExpression expression = _expressionEvaluator.Visit(_expressionContext);
         object value = expression.Evaluate();
+
+        // Check if the variable is already defined
+        if (_variables.TryGetValue(_variableName, out var existingValue))
+        {
+            // Check for type mismatch
+            if (existingValue.GetType() != value.GetType())
+            {
+                throw new InterpreterException(BasicInterpreterError.InvalidTypeAssignment);
+            }
+        }
+
+        // Check if the variable name ends with $, indicating a string variable
+        if (_variableName.EndsWith("$") && !(value is string))
+        {
+            throw new InterpreterException(BasicInterpreterError.InvalidTypeAssignment);
+        }
+
         _variables[_variableName] = value;
     }
 }
+
 
