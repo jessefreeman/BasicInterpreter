@@ -1,20 +1,18 @@
 ﻿using JesseFreeman.BasicInterpreter.Commands;
 
-namespace JesseFreeman.BasicInterpreter
+namespace JesseFreeman.BasicInterpreter;
+
+public class EndCommand : ICommand
 {
+    private readonly BasicInterpreter interpreter;
 
-    public class EndCommand : ICommand
+    public EndCommand(BasicInterpreter interpreter)
     {
-        private BasicInterpreter interpreter;
+        this.interpreter = interpreter;
+    }
 
-        public EndCommand(BasicInterpreter interpreter)
-        {
-            this.interpreter = interpreter;
-        }
-
-        public void Execute()
-        {
-            interpreter.HasEnded = true;
-        }
+    public void Execute()
+    {
+        interpreter.HasEnded = true;
     }
 }

@@ -1,14 +1,11 @@
-﻿using System;
-namespace JesseFreeman.BasicInterpreter.Exceptions
+﻿namespace JesseFreeman.BasicInterpreter.Exceptions;
+
+public class GosubCommandException : Exception
 {
-    public class GosubCommandException : Exception
+    public GosubCommandException(int targetLineNumber)
     {
-        public int TargetLineNumber { get; }
-
-        public GosubCommandException(int targetLineNumber)
-        {
-            TargetLineNumber = targetLineNumber;
-        }
+        TargetLineNumber = targetLineNumber;
     }
-}
 
+    public int TargetLineNumber { get; }
+}

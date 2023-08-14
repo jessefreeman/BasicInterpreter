@@ -1,22 +1,18 @@
-﻿using System;
-using JesseFreeman.BasicInterpreter.Exceptions;
+﻿using JesseFreeman.BasicInterpreter.Exceptions;
 
-namespace JesseFreeman.BasicInterpreter.Commands
+namespace JesseFreeman.BasicInterpreter.Commands;
+
+public class GosubCommand : ICommand
 {
-    public class GosubCommand : ICommand
+    public GosubCommand(int targetLineNumber)
     {
-        public int TargetLineNumber { get; }
-
-        public GosubCommand(int targetLineNumber)
-        {
-            TargetLineNumber = targetLineNumber;
-        }
-
-        public void Execute()
-        {
-            throw new GosubCommandException(TargetLineNumber);
-        }
+        TargetLineNumber = targetLineNumber;
     }
 
-}
+    public int TargetLineNumber { get; }
 
+    public void Execute()
+    {
+        throw new GosubCommandException(TargetLineNumber);
+    }
+}

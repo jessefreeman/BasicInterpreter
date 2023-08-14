@@ -12,30 +12,27 @@ public class ThrowingErrorStrategy : DefaultErrorStrategy
     {
         _interpreter = interpreter;
     }
-    
+
     public override void Recover(Parser recognizer, RecognitionException e)
     {
-        int physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
+        var physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
         _interpreter.SetCurrentLineNumber(_interpreter.PhysicalToBasicLineNumbers[physicalLineNumber]);
         throw new InterpreterException(BasicInterpreterError.ParsingError);
     }
 
     protected override void ReportInputMismatch(Parser recognizer, InputMismatchException e)
     {
-        int physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
+        var physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
         _interpreter.SetCurrentLineNumber(_interpreter.PhysicalToBasicLineNumbers[physicalLineNumber]);
         throw new InterpreterException(BasicInterpreterError.ParsingError);
     }
 
     protected override void ReportFailedPredicate(Parser recognizer, FailedPredicateException e)
     {
-        int physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
+        var physicalLineNumber = e.OffendingToken.Line; // No subtraction needed
         _interpreter.SetCurrentLineNumber(_interpreter.PhysicalToBasicLineNumbers[physicalLineNumber]);
         throw new InterpreterException(BasicInterpreterError.ParsingError);
     }
 
     // Override any other methods as needed...
 }
-
-
-

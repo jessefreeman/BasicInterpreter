@@ -1,10 +1,8 @@
-﻿using System;
-namespace JesseFreeman.BasicInterpreter.Exceptions
+﻿namespace JesseFreeman.BasicInterpreter.Exceptions;
+
+public class SkipNextCommandException : Exception
 {
-    public class SkipNextCommandException : Exception
+    public SkipNextCommandException() : base("Skip the next command due to a false IF condition.")
     {
-        public SkipNextCommandException() : base("Skip the next command due to a false IF condition.") { }
     }
-
 }
-

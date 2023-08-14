@@ -1,16 +1,18 @@
 ﻿using JesseFreeman.BasicInterpreter.Evaluators;
+using JesseFreeman.BasicInterpreter.Exceptions;
 
 namespace JesseFreeman.BasicInterpreter.Commands;
 
 public class ForCommand : ICommand
 {
-    private readonly string variableName;
-    private readonly IExpression startExpression;
     private readonly IExpression endExpression;
-    private readonly IExpression stepExpression;
     private readonly BasicInterpreter interpreter;
+    private readonly IExpression startExpression;
+    private readonly IExpression stepExpression;
+    private readonly string variableName;
 
-    public ForCommand(string variableName, IExpression startExpression, IExpression endExpression, IExpression stepExpression, BasicInterpreter interpreter)
+    public ForCommand(string variableName, IExpression startExpression, IExpression endExpression,
+        IExpression stepExpression, BasicInterpreter interpreter)
     {
         this.variableName = variableName;
         this.startExpression = startExpression;
@@ -21,28 +23,22 @@ public class ForCommand : ICommand
 
     public void Execute()
     {
-        double startValue = (double)startExpression.Evaluate();
-        double endValue = (double)endExpression.Evaluate();
-        double stepValue = stepExpression != null ? (double)stepExpression.Evaluate() : 1;
+        var startValue = (double)startExpression.Evaluate();
+        var endValue = (double)endExpression.Evaluate();
+        var stepValue = stepExpression != null ? (double)stepExpression.Evaluate() : 1;
 
-        // Set the variable to its start value regardless of whether the loop will be skipped
-        interpreter.SetVariable(variableName, startValue);
-
-        // Determine if the loop should be skipped
-        bool shouldSkip = (stepValue > 0 && startValue > endValue) || (stepValue < 0 && startValue < endValue);
-
-        if (shouldSkip)
+        if (stepValue == 0)
         {
-            // Push a "skipped" loop context onto the stack
-            interpreter.PushLoopContext(new LoopContext(variableName, endValue, stepValue, interpreter.CurrentCommandIndex, interpreter.CurrentLineNumber, interpreter.CurrentPosition, shouldSkip: true));
-            return;
+            throw new InterpreterException(BasicInterpreterError.StepValueZero);
         }
 
-        int lineNumber = interpreter.CurrentLineNumber;
-        int position = interpreter.CurrentPosition;
+        interpreter.SetVariable(variableName, startValue);
 
-        interpreter.PushLoopContext(new LoopContext(variableName, endValue, stepValue, interpreter.CurrentCommandIndex, lineNumber, position));
+        var shouldSkip = stepValue > 0 && startValue > endValue || stepValue < 0 && startValue < endValue;
+
+        var loopContext = new LoopContext(variableName, endValue, stepValue,
+            interpreter.CurrentCommandIndex, interpreter.CurrentLineNumber, interpreter.CurrentPosition, shouldSkip);
+
+        interpreter.LoopContextManager.Push(loopContext);
     }
-
-
 }

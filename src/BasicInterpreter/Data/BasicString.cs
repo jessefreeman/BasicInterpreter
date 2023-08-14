@@ -4,7 +4,10 @@ public class BasicString : IBasicVariable<string>
 {
     public string Value { get; private set; }
 
-    public string GetValue() => Value;
+    public string GetValue()
+    {
+        return Value;
+    }
 
     public void SetValue(string value)
     {

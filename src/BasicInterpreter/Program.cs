@@ -2,18 +2,19 @@
 using JesseFreeman.BasicInterpreter.Exceptions;
 using JesseFreeman.BasicInterpreter.IO;
 
-class Program
+internal class Program
 {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
-        
         var writer = new ConsoleOutputWriter();
         var reader = new ConsoleInputReader();
         var interpreter = new BasicInterpreter(writer, reader);
         var exManager = new ExceptionManager(interpreter, writer);
 
-        var code = "10 FOR I = 1 TO 10\n20 PRINT I, J\n30 NEXT I, I\n";
+        var code = "10 FOR I = 1 TO 10\n20 FOR I = 1 TO 5\n30 NEXT I\n40 NEXT I\n";
 
+        interpreter.MaxIterations = 4;
+        
         try
         {
             interpreter.Load(code);
@@ -27,8 +28,5 @@ class Program
             // Rethrow the exception to allow it to propagate up the call stack
             // throw;
         }
-
-        
     }
 }
-

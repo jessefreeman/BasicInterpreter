@@ -4,18 +4,18 @@ public enum BasicInterpreterError
 {
     DivisionByZero,
     DuplicateLineNumber,
-    // FailedPredicateParsing,
     GoSub,
     GoTo,
-    // InputMismatch,
     InvalidTypeAssignment,
     InvalidTypeOperation,
+    MaxLoopsExceeded,
     NextWithoutFor,
     OutOfMemory,
     ParsingError,
+    StepValueZero,
     Return,
     UndefinedVariable,
     UnsupportedOperation,
-    VariableNotDefined
+    VariableNotDefined,
+    
 }
-

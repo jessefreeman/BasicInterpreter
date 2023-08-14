@@ -1,16 +1,17 @@
-﻿using Antlr4.Runtime;
+﻿using System.Reflection;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using JesseFreeman.BasicInterpreter.Exceptions;
-using System.Reflection;
 
 namespace JesseFreeman.BasicInterpreter.Evaluators;
+
 public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
 {
-    private readonly Dictionary<string, object> variables;
+    private readonly Dictionary<(string, string), MethodInfo> methodCache = new();
     private readonly Dictionary<string, IExpression> operations;
     private readonly Dictionary<string, IExpression> unaryOperations;
-    private readonly Dictionary<(string, string), MethodInfo> methodCache = new Dictionary<(string, string), MethodInfo>();
+    private readonly Dictionary<string, object> variables;
 
     public ExpressionEvaluator(Dictionary<string, object> variables)
     {
@@ -31,7 +32,7 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
             { "<>", new NotEqualExpression() },
             { "AND", new LogicalAndExpression() },
             { "OR", new LogicalOrExpression() },
-            { "NOT", new LogicalNotExpression() },
+            { "NOT", new LogicalNotExpression() }
         };
 
         unaryOperations = new Dictionary<string, IExpression>
@@ -46,7 +47,7 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
             { "sgnfunc", new SgnExpression() },
             { "sinfunc", new SinExpression() },
             { "sqrfunc", new SqrExpression() },
-            { "tanfunc", new TanExpression() },
+            { "tanfunc", new TanExpression() }
         };
     }
 
@@ -54,24 +55,21 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
     {
         if (context.STRINGLITERAL() != null)
         {
-            string value = context.STRINGLITERAL().GetText().Trim('"');
+            var value = context.STRINGLITERAL().GetText().Trim('"');
             return new StringExpression(value);
         }
 
         if (context.number() != null)
         {
-            double value = double.Parse(context.number().GetText());
+            var value = double.Parse(context.number().GetText());
             return new NumberExpression(value);
         }
 
         if (context.vardecl() != null)
         {
-            string varName = context.vardecl().var_().GetText();
+            var varName = context.vardecl().var_().GetText();
 
-            if (!variables.TryGetValue(varName, out object varValue))
-            {
-                return new VariableExpression(varName, variables);
-            }
+            if (!variables.TryGetValue(varName, out var varValue)) return new VariableExpression(varName, variables);
 
             switch (varValue)
             {
@@ -84,10 +82,7 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
             }
         }
 
-        if (context.LPAREN() != null)
-        {
-            return Visit(context.expression());
-        }
+        if (context.LPAREN() != null) return Visit(context.expression());
 
         return HandleUnaryOperations(context);
     }
@@ -102,11 +97,9 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
                 var unaryExpression = InvokeMethodIfExists(unaryContext, "expression") as ParserRuleContext;
                 if (unaryExpression != null)
                 {
-                    IExpression operand = Visit(unaryExpression.GetChild(0));
-                    if (unaryOperations.TryGetValue(operationName, out IExpression operation))
-                    {
-                        return new LambdaExpression(operation, new IExpression[] { operand });
-                    }
+                    var operand = Visit(unaryExpression.GetChild(0));
+                    if (unaryOperations.TryGetValue(operationName, out var operation))
+                        return new LambdaExpression(operation, new[] { operand });
                 }
             }
         }
@@ -123,20 +116,21 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
             method = obj.GetType().GetMethod(methodName);
             methodCache[key] = method;
         }
+
         return method?.Invoke(obj, null);
     }
 
     private IExpression VisitBinaryExpression(ParserRuleContext context, Dictionary<string, IExpression> ops)
     {
-        IExpression left = Visit(context.GetChild(0));
+        var left = Visit(context.GetChild(0));
 
-        for (int i = 1; i < context.ChildCount; i += 2)
+        for (var i = 1; i < context.ChildCount; i += 2)
         {
-            string operatorSymbol = context.GetChild(i).GetText();
-            if (ops.TryGetValue(operatorSymbol, out IExpression operation))
+            var operatorSymbol = context.GetChild(i).GetText();
+            if (ops.TryGetValue(operatorSymbol, out var operation))
             {
-                IExpression right = Visit(context.GetChild(i + 1));
-                left = new LambdaExpression(operation, new IExpression[] { left, right });
+                var right = Visit(context.GetChild(i + 1));
+                left = new LambdaExpression(operation, new[] { left, right });
             }
             else
             {
@@ -176,54 +170,38 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
         {
             // Get the expression that follows the NOT token
             var exprContext = context.addingExpression(0);
-            if (exprContext == null)
-            {
-                throw new Exception("Expression context is null after NOT token");
-            }
+            if (exprContext == null) throw new Exception("Expression context is null after NOT token");
 
-            IExpression operand = Visit(exprContext);
+            var operand = Visit(exprContext);
 
             // Apply the NOT operation
-            if (operations.TryGetValue("NOT", out IExpression notOperation))
-            {
-                return new LambdaExpression(notOperation, new IExpression[] { operand });
-            }
-            else
-            {
-                throw new InterpreterException(BasicInterpreterError.UnsupportedOperation);
+            if (operations.TryGetValue("NOT", out var notOperation))
+                return new LambdaExpression(notOperation, new[] { operand });
+            throw new InterpreterException(BasicInterpreterError.UnsupportedOperation);
 
-                // throw new UnsupportedOperationException("NOT operation not found in operations dictionary");
-            }
+            // throw new UnsupportedOperationException("NOT operation not found in operations dictionary");
         }
 
         // Check if the context contains a relational expression
         if (context.relop() == null)
-        {
             // If not, treat it as an adding expression
             return VisitAddingExpression(context.addingExpression(0));
-        }
 
         // Get the left and right operands
         var leftContext = context.addingExpression(0);
         var rightContext = context.addingExpression(1);
-        if (leftContext == null || rightContext == null)
-        {
-            throw new Exception("Left or right context is null");
-        }
+        if (leftContext == null || rightContext == null) throw new Exception("Left or right context is null");
 
-        IExpression left = Visit(leftContext);
-        IExpression right = Visit(rightContext);
+        var left = Visit(leftContext);
+        var right = Visit(rightContext);
 
         // Get the operation
-        string operatorSymbol = context.relop().GetText();
-        if (!operations.TryGetValue(operatorSymbol, out IExpression operation))
-        {
+        var operatorSymbol = context.relop().GetText();
+        if (!operations.TryGetValue(operatorSymbol, out var operation))
             throw new InterpreterException(BasicInterpreterError.UnsupportedOperation);
 
-            // throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
-        }
+        // throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
 
-        return new LambdaExpression(operation, new IExpression[] { left, right });
+        return new LambdaExpression(operation, new[] { left, right });
     }
-
 }

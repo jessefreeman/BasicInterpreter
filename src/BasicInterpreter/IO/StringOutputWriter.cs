@@ -1,33 +1,31 @@
 ﻿using System.Text;
 
-namespace JesseFreeman.BasicInterpreter.IO
+namespace JesseFreeman.BasicInterpreter.IO;
+
+public class StringOutputWriter : IOutputWriter
 {
-    public class StringOutputWriter : IOutputWriter
+    private readonly StringBuilder output = new();
+
+    public void WriteLine(string line)
     {
-        private StringBuilder output = new StringBuilder();
+        output.AppendLine(line);
+    }
 
-        public void WriteLine(string line)
-        {
-            output.AppendLine(line);
-        }
+    public void Write(string text)
+    {
+        output.Append(text);
+    }
 
-        public void Write(string text)
-        {
-            output.Append(text);
-        }
+    public void NewLine()
+    {
+        output.AppendLine();
+    }
 
-        public void NewLine()
-        {
-            output.AppendLine();
-        }
+    public string Output => output.ToString();
 
-        public string Output => output.ToString();
-
-        // Add a method to clear the output
-        public void Clear()
-        {
-            output.Clear();
-        }
+    // Add a method to clear the output
+    public void Clear()
+    {
+        output.Clear();
     }
 }
-

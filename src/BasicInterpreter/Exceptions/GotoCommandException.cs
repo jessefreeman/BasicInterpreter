@@ -1,13 +1,11 @@
-﻿namespace JesseFreeman.BasicInterpreter.Exceptions
+﻿namespace JesseFreeman.BasicInterpreter.Exceptions;
+
+public class GotoCommandException : Exception
 {
-    public class GotoCommandException : Exception
+    public GotoCommandException(int targetLineNumber)
     {
-        public int TargetLineNumber { get; }
-
-        public GotoCommandException(int targetLineNumber)
-        {
-            TargetLineNumber = targetLineNumber;
-        }
+        TargetLineNumber = targetLineNumber;
     }
-}
 
+    public int TargetLineNumber { get; }
+}

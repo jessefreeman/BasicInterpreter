@@ -4,7 +4,10 @@ public class BasicNumber : IBasicVariable<double>
 {
     public double Value { get; private set; }
 
-    public double GetValue() => Value;
+    public double GetValue()
+    {
+        return Value;
+    }
 
     public void SetValue(double value)
     {

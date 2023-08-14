@@ -1,15 +1,11 @@
-﻿
-using JesseFreeman.BasicInterpreter.Exceptions;
+﻿using JesseFreeman.BasicInterpreter.Exceptions;
 
-namespace JesseFreeman.BasicInterpreter.Commands
+namespace JesseFreeman.BasicInterpreter.Commands;
+
+public class ReturnCommand : ICommand
 {
-    public class ReturnCommand : ICommand
+    public void Execute()
     {
-        public void Execute()
-        {
-            throw new ReturnCommandException();
-        }
+        throw new ReturnCommandException();
     }
-
 }
-

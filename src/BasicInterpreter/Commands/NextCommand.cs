@@ -1,68 +1,52 @@
-﻿using System;
-using JesseFreeman.BasicInterpreter.Exceptions;
+﻿using JesseFreeman.BasicInterpreter.Exceptions;
 
-namespace JesseFreeman.BasicInterpreter.Commands
+namespace JesseFreeman.BasicInterpreter.Commands;
+
+public class NextCommand : ICommand
 {
-    public class NextCommand : ICommand
+    private readonly BasicInterpreter interpreter;
+    public List<string> VariableNames { get; }
+
+    public NextCommand(BasicInterpreter interpreter, List<string> variableNames)
     {
-        private readonly BasicInterpreter interpreter;
-        private readonly string variableName;
+        this.interpreter = interpreter;
+        VariableNames = variableNames; // No need for null-coalescing operator
+    }
 
-        // Add this property to expose the variableName field
-        public string VariableName => variableName;
-
-        public NextCommand(BasicInterpreter interpreter, string variableName)
+    public void Execute()
+    {
+        // Iterate through the variable names in reverse order
+        foreach (var variableName in VariableNames.AsEnumerable().Reverse())
         {
-            this.interpreter = interpreter;
-            this.variableName = variableName;
-        }
-
-        public void Execute()
-        {
-            // Try to get the loop context for the variable
-            LoopContext loopContext;
-            try
+            if (interpreter.LoopContextManager.IsEmpty())
             {
-                loopContext = interpreter.GetLoopContext(variableName);
-            }
-            catch (InvalidOperationException)
-            {
-                // If no loop context is found, throw a specific exception for "NEXT without FOR"
+                // If the loop stack is empty, throw a "NEXT without FOR" error
                 throw new InterpreterException(BasicInterpreterError.NextWithoutFor);
             }
 
-            // Check if the loop should be skipped
-            if (loopContext.ShouldSkip)
-            {
-                interpreter.PopLoopContext();
-                return;
-            }
+            // Try to get the loop context for the variable
+            var loopContext = interpreter.LoopContextManager.Pop();
 
-            // Increment the loop variable by the step value
-            double currentValue = interpreter.GetVariable(loopContext.VariableName);
+            var currentValue = interpreter.GetVariable(loopContext.VariableName);
             currentValue += loopContext.StepValue;
             interpreter.SetVariable(loopContext.VariableName, currentValue);
 
-            // Check if the loop should terminate
-            if ((loopContext.StepValue > 0 && currentValue > loopContext.EndValue) ||
-                (loopContext.StepValue < 0 && currentValue < loopContext.EndValue))
+            if ((loopContext.StepValue > 0 && currentValue <= loopContext.EndValue) ||
+                (loopContext.StepValue < 0 && currentValue >= loopContext.EndValue))
             {
-                // Terminate the loop by popping the loop context
-                interpreter.PopLoopContext();
-            }
-            else
-            {
-                // Update the loop context with the new current value
-                LoopContext updatedLoopContext = new LoopContext(loopContext.VariableName, loopContext.EndValue, loopContext.StepValue, loopContext.CommandIndex, loopContext.LineNumber, loopContext.Position);
-                interpreter.PopLoopContext(); // Pop the old loop context
-                interpreter.PushLoopContext(updatedLoopContext); // Push the updated loop context
+                // If the loop is not finished, push the updated loop context back onto the stack
+                var updatedLoopContext = new LoopContext(loopContext.VariableName, loopContext.EndValue,
+                    loopContext.StepValue, loopContext.CommandIndex, loopContext.LineNumber, loopContext.Position, loopContext.ShouldSkip);
 
-                // Continue the loop by jumping back to the stored command index
+                interpreter.LoopContextManager.Push(updatedLoopContext);
                 interpreter.JumpToCommandIndex(loopContext.CommandIndex);
+                break; // Break out of the loop to continue executing the inner loop
             }
         }
-
     }
 
+
+    
 }
+
 
