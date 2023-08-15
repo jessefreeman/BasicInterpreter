@@ -6,6 +6,7 @@ public enum BasicInterpreterError
     DuplicateLineNumber,
     GoSub,
     GoTo,
+    ForWithoutNext,
     InvalidTypeAssignment,
     InvalidTypeOperation,
     MaxLoopsExceeded,

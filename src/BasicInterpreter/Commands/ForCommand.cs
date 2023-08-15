@@ -9,7 +9,7 @@ public class ForCommand : ICommand
     private readonly BasicInterpreter interpreter;
     private readonly IExpression startExpression;
     private readonly IExpression stepExpression;
-    private readonly string variableName;
+    public readonly string variableName;
 
     public ForCommand(string variableName, IExpression startExpression, IExpression endExpression,
         IExpression stepExpression, BasicInterpreter interpreter)

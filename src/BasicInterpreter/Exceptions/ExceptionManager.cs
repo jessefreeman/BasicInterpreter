@@ -10,6 +10,7 @@ public class ExceptionManager
         { BasicInterpreterError.DuplicateLineNumber, "Duplicate line number at {line}" },
         { BasicInterpreterError.GoSub, "Undefined line number in GOSUB at {line}" },
         { BasicInterpreterError.GoTo, "Undefined line number in GOTO at {line}" },
+        { BasicInterpreterError.ForWithoutNext, "FOR without NEXT at {line}" },
         { BasicInterpreterError.InvalidTypeAssignment, "Invalid type assignment at {line}" },
         { BasicInterpreterError.InvalidTypeOperation, "Invalid type operation at {line}" },
         { BasicInterpreterError.MaxLoopsExceeded, "Maximum number of loops exceeded" },

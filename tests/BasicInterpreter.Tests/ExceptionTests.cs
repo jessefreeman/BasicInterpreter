@@ -20,7 +20,7 @@ public class ExceptionTests
         exManager = new ExceptionManager(interpreter, writer);
     }
     
-    [Theory]
+    [Theory] // Verified
     [InlineData("10 PRINT \"Hello, World!\"\n20 GOTO 10\n30 END", "Hello, World!\nHello, World!\n", BasicInterpreterError.MaxLoopsExceeded)]
     public void TestMaxIterations(string script, string expectedPrintedOutput, BasicInterpreterError expectedErrorType)
     {
@@ -49,9 +49,9 @@ public class ExceptionTests
     }
     
     [Theory]
-        [InlineData("10 PRINT x", 10)] // x is not defined
-        [InlineData("10 PRINT A$", 10)] // Test undefined variable
-        [InlineData("10 LET B = 5\n20 PRINT A$", 20)] // Test undefined variable in later line
+        [InlineData("10 PRINT x", 10)] // x is not defined (Should default to 0)
+        [InlineData("10 PRINT A$", 10)] // Test undefined variable (Should be empty)
+        [InlineData("10 LET B = 5\n20 PRINT A$", 20)] // Test undefined variable in later line (This should be empty)
         [InlineData("10 FOR I = 1 TO 3\n20 PRINT A$\n30 NEXT I", 20)] // Test undefined variable inside a loop
         [InlineData("10 LET B$ = \"Hello\"\n20 FOR I = 1 TO 3\n30 PRINT A$\n40 NEXT I", 30)] // Test undefined variable inside a loop with other defined variables
         [InlineData("10 GOTO 100\n20 END\n100 PRINT A$", 100)] // Test undefined variable after a GOTO statement
@@ -209,9 +209,10 @@ public class ExceptionTests
         }
 
         [Theory]
-        // [InlineData("10 FOR I = 1 TO 10\n30 NEXT J\n", BasicInterpreterError.VariableNotDefined, 30)] // Mismatched NEXT variable
-        [InlineData("10 FOR I = 1 TO 10\n20 FOR I = 1 TO 5\n30 NEXT I\n40 NEXT I\n", BasicInterpreterError.MaxLoopsExceeded, 40)] // Extra NEXT statement
-        // [InlineData("10 FOR I = 1 TO 10\n20 NEXT I\n30 NEXT I\n", BasicInterpreterError.NextWithoutFor, 30)] // Extra NEXT statement without corresponding FOR
+        [InlineData("10 FOR I = 1 TO 10\n30 NEXT J\n", BasicInterpreterError.NextWithoutFor, 30)] // Mismatched NEXT variable
+        [InlineData("10 FOR I = 1 TO 10\n20 FOR I = 1 TO 5\n30 NEXT I\n40 NEXT I\n", BasicInterpreterError.NextWithoutFor, 40)] // Extra NEXT statement
+        [InlineData("10 FOR I = 1 TO 10\n20 NEXT I\n30 NEXT I\n", BasicInterpreterError.NextWithoutFor, 30)] // Extra NEXT statement without corresponding FOR
+        [InlineData("10 FOR I = 1 TO 10\n20 PRINT I\n30 FOR J = 1 TO 5\n40 PRINT J\n50 NEXT J\n", BasicInterpreterError.ForWithoutNext, 10)]
         public void TestInvalidLoops(string script, BasicInterpreterError expectedErrorType, int expectedErrorLineNumber)
         {
             var exception = Record.Exception(() =>

@@ -80,7 +80,44 @@ public class BasicInterpreter : IBasicInterpreterState
         }
 
         commands.Sort((cmd1, cmd2) => cmd1.lineNum.CompareTo(cmd2.lineNum));
+
+        // Check for unmatched FOR and NEXT commands
+        var forStack = new Stack<(int lineNum, string variableName)>();
+        foreach (var command in commands)
+        {
+            if (command.command is CompositeCommand compositeCommand)
+            {
+                foreach (var innerCommand in compositeCommand.Commands)
+                {
+                    if (innerCommand is ForCommand forCommand)
+                    {
+                        forStack.Push((command.lineNum, forCommand.variableName));
+                    }
+                    else if (innerCommand is NextCommand nextCommand)
+                    {
+                        if (forStack.Count == 0 || forStack.Peek().variableName != nextCommand.VariableNames.Last())
+                        {
+                            throw new InterpreterException(BasicInterpreterError.NextWithoutFor);
+                        }
+                        forStack.Pop();
+                    }
+                }
+            }
+        }
+
+        // Check for unmatched FOR commands
+        if (forStack.Count > 0)
+        {
+            // Get the line number of the unmatched FOR command
+            var unmatchedForLineNumber = forStack.Pop().lineNum;
+            throw new InterpreterException(BasicInterpreterError.ForWithoutNext)
+            {
+                Data = { { "line", unmatchedForLineNumber } }
+            };
+        }
     }
+
+
 
     private int ExtractBasicLineNumber(string line)
     {
