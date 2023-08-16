@@ -2,30 +2,35 @@
 
 namespace JesseFreeman.BasicInterpreter.IO;
 
-public class StringOutputWriter : IOutputWriter
+public class StringOutputWriter : BaseOutputWriter
 {
     private readonly StringBuilder output = new();
 
-    public void WriteLine(string line)
+    public override void WriteLine(string line)
     {
         output.AppendLine(line);
+        currentLinePosition = 0;
     }
 
-    public void Write(string text)
+    public override void Write(string text)
     {
         output.Append(text);
+        currentLinePosition += text.Length;
     }
 
-    public void NewLine()
+    public override void NewLine()
     {
         output.AppendLine();
+        currentLinePosition = 0;
     }
 
     public string Output => output.ToString();
 
-    // Add a method to clear the output
     public void Clear()
     {
         output.Clear();
+        currentLinePosition = 0;
     }
 }
+
+

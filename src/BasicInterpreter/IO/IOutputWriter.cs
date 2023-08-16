@@ -7,8 +7,9 @@
 /// </summary>
 public interface IOutputWriter
 {
-    string Output { get; }
+    int TabSize { get; set; }
     void WriteLine(string line = "");
     void Write(string text);
+    void WriteSeparator(char separator);
     void NewLine();
 }

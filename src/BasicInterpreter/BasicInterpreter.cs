@@ -95,17 +95,27 @@ public class BasicInterpreter : IBasicInterpreterState
                     }
                     else if (innerCommand is NextCommand nextCommand)
                     {
-                        if (forStack.Count == 0 || forStack.Peek().variableName != nextCommand.VariableNames.Last())
+                        // Check that the NextCommand has the same number of variables as the corresponding FOR commands
+                        if (nextCommand.VariableNames.Count > forStack.Count)
                         {
                             throw new InterpreterException(BasicInterpreterError.NextWithoutFor);
                         }
-                        forStack.Pop();
+
+                        // Pop the stack once for each variable in the NextCommand
+                        for (int i = 0; i < nextCommand.VariableNames.Count; i++)
+                        {
+                            if (forStack.Count == 0)
+                            {
+                                throw new InterpreterException(BasicInterpreterError.NextWithoutFor);
+                            }
+                            forStack.Pop();
+                        }
                     }
                 }
             }
         }
 
-        // Check for unmatched FOR commands
+// Check for unmatched FOR commands
         if (forStack.Count > 0)
         {
             // Get the line number of the unmatched FOR command
@@ -115,6 +125,7 @@ public class BasicInterpreter : IBasicInterpreterState
                 Data = { { "line", unmatchedForLineNumber } }
             };
         }
+
     }
 
 
@@ -188,4 +199,18 @@ public class BasicInterpreter : IBasicInterpreterState
     {
         CurrentCommandIndex = index;
     }
+    
+    private readonly Dictionary<string, ForCommand> forCommands = new();
+
+    public void RegisterForCommand(string variableName, ForCommand forCommand)
+    {
+        forCommands[variableName] = forCommand;
+    }
+
+    public ForCommand GetCorrespondingForCommand(string variableName)
+    {
+        forCommands.TryGetValue(variableName, out var forCommand);
+        return forCommand;
+    }
+
 }

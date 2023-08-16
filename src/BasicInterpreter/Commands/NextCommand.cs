@@ -10,22 +10,22 @@ public class NextCommand : ICommand
     public NextCommand(BasicInterpreter interpreter, List<string> variableNames)
     {
         this.interpreter = interpreter;
-        VariableNames = variableNames; // No need for null-coalescing operator
+        VariableNames = variableNames ?? new List<string>(); // Handle null variableNames
     }
 
     public void Execute()
     {
-        // Iterate through the variable names in reverse order
-        foreach (var variableName in VariableNames.AsEnumerable().Reverse())
+        // Iterate through the variable names in the order they are provided
+        foreach (var variableName in VariableNames)
         {
-            if (interpreter.LoopContextManager.IsEmpty())
+            if (interpreter.LoopContextManager.IsEmpty(variableName))
             {
-                // If the loop stack is empty, throw a "NEXT without FOR" error
+                // If the loop stack is empty for the given variable, throw a "NEXT without FOR" error
                 throw new InterpreterException(BasicInterpreterError.NextWithoutFor);
             }
 
             // Try to get the loop context for the variable
-            var loopContext = interpreter.LoopContextManager.Pop();
+            var loopContext = interpreter.LoopContextManager.Pop(variableName);
 
             var currentValue = interpreter.GetVariable(loopContext.VariableName);
             currentValue += loopContext.StepValue;
@@ -38,15 +38,15 @@ public class NextCommand : ICommand
                 var updatedLoopContext = new LoopContext(loopContext.VariableName, loopContext.EndValue,
                     loopContext.StepValue, loopContext.CommandIndex, loopContext.LineNumber, loopContext.Position, loopContext.ShouldSkip);
 
-                interpreter.LoopContextManager.Push(updatedLoopContext);
+                interpreter.LoopContextManager.Push(variableName, updatedLoopContext);
                 interpreter.JumpToCommandIndex(loopContext.CommandIndex);
-                break; // Break out of the loop to continue executing the inner loop
+                return; // Return after processing the innermost loop
             }
         }
     }
 
-
-    
 }
+
+
 
 

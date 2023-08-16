@@ -89,8 +89,18 @@ vardecl
 // printstmt1
 //   : PRINT expression?
 //   ;
+//printstmt1
+//   : PRINT exprlist?
+//   ;
 printstmt1
-   : PRINT exprlist?
+   : PRINT exprWithSeparator*
+   ;
+exprWithSeparator
+   : expression separator?
+   ;
+separator
+   : SEMICOLON
+   | COMMA
    ;
 getstmt
    : GET exprlist

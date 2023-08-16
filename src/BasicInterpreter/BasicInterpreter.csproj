@@ -10,4 +10,8 @@
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AntlrGenerated" />
+  </ItemGroup>
 </Project>

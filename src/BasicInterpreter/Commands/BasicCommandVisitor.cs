@@ -69,10 +69,25 @@ public class BasicCommandVisitor : BasicBaseVisitor<ICommand>
 
     public override ICommand VisitPrintstmt1(BasicParser.Printstmt1Context context)
     {
-        var expressionContexts = context.exprlist()?.expression().ToList() ?? new List<BasicParser.ExpressionContext>();
-        return new PrintCommand(expressionContexts, expressionEvaluator, writer);
-    }
+        var expressionContexts = new List<BasicParser.ExpressionContext>();
+        var separators = new List<char>();
 
+        // Iterate through the exprWithSeparator contexts
+        foreach (var exprWithSeparatorContext in context.exprWithSeparator())
+        {
+            expressionContexts.Add(exprWithSeparatorContext.expression());
+
+            // Check if there is a separator
+            var separatorContext = exprWithSeparatorContext.separator();
+            if (separatorContext != null)
+            {
+                char separatorChar = separatorContext.GetText() == ";" ? ';' : ',';
+                separators.Add(separatorChar);
+            }
+        }
+
+        return new PrintCommand(expressionContexts, separators, expressionEvaluator, writer);
+    }
 
     public override ICommand VisitLetstmt(BasicParser.LetstmtContext context)
     {
@@ -130,16 +145,24 @@ public class BasicCommandVisitor : BasicBaseVisitor<ICommand>
         var endExpression = expressionEvaluator.Visit(context.expression(1));
         var stepExpression = context.expression(2) != null ? expressionEvaluator.Visit(context.expression(2)) : null;
 
-        return new ForCommand(variableName, startExpression, endExpression, stepExpression, interpreter);
+        var forCommand = new ForCommand(variableName, startExpression, endExpression, stepExpression, interpreter);
+        interpreter.RegisterForCommand(variableName, forCommand); // Register the ForCommand with the interpreter
+
+        return forCommand;
     }
 
     public override ICommand VisitNextstmt([NotNull] BasicParser.NextstmtContext context)
     {
-        // Get the variable names from the context
         var variableNames = context.vardecl()?.Select(v => v.var_().GetText()).ToList() ?? new List<string>();
+        var nextCommand = new NextCommand(interpreter, variableNames);
 
-        // Create a NextCommand object with the list of variable names
-        return new NextCommand(interpreter, variableNames);
+        foreach (var variableName in variableNames)
+        {
+            var correspondingForCommand = interpreter.GetCorrespondingForCommand(variableName);
+            correspondingForCommand.CorrespondingNextCommand = nextCommand; // Associate the ForCommand with the NextCommand
+        }
+
+        return nextCommand;
     }
 
     public override ICommand VisitInputstmt([NotNull] BasicParser.InputstmtContext context)

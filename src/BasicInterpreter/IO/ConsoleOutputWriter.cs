@@ -7,25 +7,23 @@ namespace JesseFreeman.BasicInterpreter.IO;
 ///     that writes output to the console. It is used when the output of the BASIC interpreter
 ///     needs to be displayed on the console.
 /// </summary>
-public class ConsoleOutputWriter : IOutputWriter
+public class ConsoleOutputWriter : BaseOutputWriter
 {
-    // Not implemented in the console so return an empty string
-    private readonly StringBuilder output = new();
-
-    public string Output => output.ToString();
-
-    public void WriteLine(string line)
+    public override void WriteLine(string line)
     {
         Console.WriteLine(line);
+        currentLinePosition = 0;
     }
 
-    public void Write(string text)
+    public override void Write(string text)
     {
         Console.Write(text);
+        currentLinePosition += text.Length;
     }
 
-    public void NewLine()
+    public override void NewLine()
     {
         Console.WriteLine();
+        currentLinePosition = 0;
     }
 }

@@ -4,28 +4,26 @@ namespace JesseFreeman.BasicInterpreter;
 
 public class LoopContextManager
 {
-    private readonly Stack<LoopContext> loopStack = new();
+    private readonly Dictionary<string, Stack<LoopContext>> loopContextsPerVariable = new();
 
-    public void Push(LoopContext context)
+    public void Push(string variableName, LoopContext context)
     {
-        loopStack.Push(context);
+        if (!loopContextsPerVariable.ContainsKey(variableName))
+        {
+            loopContextsPerVariable[variableName] = new Stack<LoopContext>();
+        }
+
+        loopContextsPerVariable[variableName].Push(context);
     }
 
-    public LoopContext Pop()
+    public LoopContext Pop(string variableName)
     {
-        return loopStack.Pop();
+        return loopContextsPerVariable[variableName].Pop();
     }
 
-    public LoopContext Peek() // Added Peek method
+    public bool IsEmpty(string variableName)
     {
-        if (loopStack.Count == 0)
-            throw new InvalidOperationException("Stack is empty");
-        return loopStack.Peek();
-    }
-
-    public bool IsEmpty()
-    {
-        return loopStack.Count == 0;
+        return !loopContextsPerVariable.ContainsKey(variableName) || loopContextsPerVariable[variableName].Count == 0;
     }
 }
 

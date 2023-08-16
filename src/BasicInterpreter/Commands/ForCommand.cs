@@ -10,6 +10,8 @@ public class ForCommand : ICommand
     private readonly IExpression startExpression;
     private readonly IExpression stepExpression;
     public readonly string variableName;
+    
+    public NextCommand CorrespondingNextCommand { get; set; }
 
     public ForCommand(string variableName, IExpression startExpression, IExpression endExpression,
         IExpression stepExpression, BasicInterpreter interpreter)
@@ -39,6 +41,6 @@ public class ForCommand : ICommand
         var loopContext = new LoopContext(variableName, endValue, stepValue,
             interpreter.CurrentCommandIndex, interpreter.CurrentLineNumber, interpreter.CurrentPosition, shouldSkip);
 
-        interpreter.LoopContextManager.Push(loopContext);
+        interpreter.LoopContextManager.Push(variableName, loopContext); // Push with variable name
     }
 }
