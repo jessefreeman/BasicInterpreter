@@ -1,5 +1,9 @@
-﻿using JesseFreeman.BasicInterpreter.Evaluators;
+﻿#region
+
+using JesseFreeman.BasicInterpreter.Evaluators;
 using JesseFreeman.BasicInterpreter.Exceptions;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Commands;
 
@@ -10,8 +14,6 @@ public class ForCommand : ICommand
     private readonly IExpression startExpression;
     private readonly IExpression stepExpression;
     public readonly string variableName;
-    
-    public NextCommand CorrespondingNextCommand { get; set; }
 
     public ForCommand(string variableName, IExpression startExpression, IExpression endExpression,
         IExpression stepExpression, BasicInterpreter interpreter)
@@ -23,16 +25,15 @@ public class ForCommand : ICommand
         this.interpreter = interpreter;
     }
 
+    public NextCommand CorrespondingNextCommand { get; set; }
+
     public void Execute()
     {
-        var startValue = (double)startExpression.Evaluate();
-        var endValue = (double)endExpression.Evaluate();
-        var stepValue = stepExpression != null ? (double)stepExpression.Evaluate() : 1;
+        var startValue = (double) startExpression.Evaluate();
+        var endValue = (double) endExpression.Evaluate();
+        var stepValue = stepExpression != null ? (double) stepExpression.Evaluate() : 1;
 
-        if (stepValue == 0)
-        {
-            throw new InterpreterException(BasicInterpreterError.StepValueZero);
-        }
+        if (stepValue == 0) throw new InterpreterException(BasicInterpreterError.StepValueZero);
 
         interpreter.SetVariable(variableName, startValue);
 

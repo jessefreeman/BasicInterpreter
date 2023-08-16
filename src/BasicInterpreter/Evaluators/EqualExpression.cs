@@ -18,10 +18,7 @@ public class EqualExpression : IExpression
             throw new ArgumentException("Exactly two operands are required for EqualExpression.");
 
         // If both operands are integers, compare them as integers.
-        if (operands[0] is int leftInt && operands[1] is int rightInt)
-        {
-            return leftInt == rightInt;
-        }
+        if (operands[0] is int leftInt && operands[1] is int rightInt) return leftInt == rightInt;
 
         // If either operand is not an integer, convert both operands to double and compare them as doubles.
         var leftOperand = Convert.ToDouble(operands[0]);

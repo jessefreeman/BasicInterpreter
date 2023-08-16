@@ -1,1 +1,5 @@
-﻿global using Xunit;
+﻿#region
+
+global using Xunit;
+
+#endregion

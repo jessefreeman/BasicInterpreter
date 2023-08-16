@@ -17,6 +17,5 @@ public enum BasicInterpreterError
     Return,
     UndefinedVariable,
     UnsupportedOperation,
-    VariableNotDefined,
-    
+    VariableNotDefined
 }

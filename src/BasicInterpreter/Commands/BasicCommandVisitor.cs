@@ -1,9 +1,13 @@
-﻿using Antlr4.Runtime.Misc;
+﻿#region
+
+using Antlr4.Runtime.Misc;
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using Jessefreeman.BasicInterpreter.Commands;
 using JesseFreeman.BasicInterpreter.Evaluators;
 using JesseFreeman.BasicInterpreter.Exceptions;
 using JesseFreeman.BasicInterpreter.IO;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Commands;
 
@@ -67,26 +71,33 @@ public class BasicCommandVisitor : BasicBaseVisitor<ICommand>
         return new CompositeCommand(commands);
     }
 
+    // public override ICommand VisitPrintstmt1(BasicParser.Printstmt1Context context)
+    // {
+    //     var expressionContexts = new List<BasicParser.ExpressionContext>();
+    //     var separators = new List<char>();
+    //
+    //     // Iterate through the exprWithSeparator contexts
+    //     foreach (var exprWithSeparatorContext in context.exprWithSeparator())
+    //     {
+    //         expressionContexts.Add(exprWithSeparatorContext.expression());
+    //
+    //         // Check if there is a separator
+    //         var separatorContext = exprWithSeparatorContext.separator();
+    //         if (separatorContext != null)
+    //         {
+    //             var separatorChar = separatorContext.GetText() == ";" ? ';' : ',';
+    //             separators.Add(separatorChar);
+    //         }
+    //     }
+    //
+    //     return new PrintCommand(expressionContexts, separators, expressionEvaluator, writer);
+    // }
     public override ICommand VisitPrintstmt1(BasicParser.Printstmt1Context context)
     {
-        var expressionContexts = new List<BasicParser.ExpressionContext>();
-        var separators = new List<char>();
+        var expressions = context.expression().Select(expr => expr).ToList();
+        var separators = context.separator().Select(sep => sep.GetText() == ";" ? ';' : ',').ToList();
 
-        // Iterate through the exprWithSeparator contexts
-        foreach (var exprWithSeparatorContext in context.exprWithSeparator())
-        {
-            expressionContexts.Add(exprWithSeparatorContext.expression());
-
-            // Check if there is a separator
-            var separatorContext = exprWithSeparatorContext.separator();
-            if (separatorContext != null)
-            {
-                char separatorChar = separatorContext.GetText() == ";" ? ';' : ',';
-                separators.Add(separatorChar);
-            }
-        }
-
-        return new PrintCommand(expressionContexts, separators, expressionEvaluator, writer);
+        return new PrintCommand(expressions, separators, expressionEvaluator, writer);
     }
 
     public override ICommand VisitLetstmt(BasicParser.LetstmtContext context)
@@ -159,7 +170,8 @@ public class BasicCommandVisitor : BasicBaseVisitor<ICommand>
         foreach (var variableName in variableNames)
         {
             var correspondingForCommand = interpreter.GetCorrespondingForCommand(variableName);
-            correspondingForCommand.CorrespondingNextCommand = nextCommand; // Associate the ForCommand with the NextCommand
+            correspondingForCommand.CorrespondingNextCommand =
+                nextCommand; // Associate the ForCommand with the NextCommand
         }
 
         return nextCommand;

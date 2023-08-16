@@ -1,4 +1,8 @@
+#region
+
 using JesseFreeman.BasicInterpreter.Commands;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter;
 
@@ -9,9 +13,7 @@ public class LoopContextManager
     public void Push(string variableName, LoopContext context)
     {
         if (!loopContextsPerVariable.ContainsKey(variableName))
-        {
             loopContextsPerVariable[variableName] = new Stack<LoopContext>();
-        }
 
         loopContextsPerVariable[variableName].Push(context);
     }
@@ -26,4 +28,3 @@ public class LoopContextManager
         return !loopContextsPerVariable.ContainsKey(variableName) || loopContextsPerVariable[variableName].Count == 0;
     }
 }
-

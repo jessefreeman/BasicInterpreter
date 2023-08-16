@@ -122,16 +122,6 @@ public interface IBasicListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitPrintstmt1([NotNull] BasicParser.Printstmt1Context context);
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="BasicParser.exprWithSeparator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterExprWithSeparator([NotNull] BasicParser.ExprWithSeparatorContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="BasicParser.exprWithSeparator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitExprWithSeparator([NotNull] BasicParser.ExprWithSeparatorContext context);
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="BasicParser.separator"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

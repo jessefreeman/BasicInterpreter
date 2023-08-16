@@ -18,7 +18,7 @@ public class LogicalOrExpression : IExpression
         if (left is double leftDouble && right is double rightDouble)
             // Convert doubles to integers for bitwise OR operation
             // Return a boolean indicating whether the result is non-zero
-            return ((int)leftDouble | (int)rightDouble) != 0;
+            return ((int) leftDouble | (int) rightDouble) != 0;
         throw new ArgumentException(
             "Invalid operand types for LogicalOrExpression. Both operands must be either boolean or double.");
     }

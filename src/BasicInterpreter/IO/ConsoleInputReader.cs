@@ -1,6 +1,4 @@
-﻿// Import the System namespace to access Console class
-
-namespace JesseFreeman.BasicInterpreter.IO;
+﻿namespace JesseFreeman.BasicInterpreter.IO;
 
 /// <summary>
 ///     The ConsoleInputReader class implements the IInputReader interface and provides a way to read input lines from the

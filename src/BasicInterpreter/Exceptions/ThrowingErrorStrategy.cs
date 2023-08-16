@@ -1,4 +1,8 @@
-﻿using Antlr4.Runtime;
+﻿#region
+
+using Antlr4.Runtime;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Exceptions;
 

@@ -22,7 +22,7 @@ public class IntExpression : IExpression
         // Check if the operand is of type double.
         if (operand is double doubleValue)
             // Convert the double value to an integer and then back to a double to get the integer part.
-            return (double)(int)doubleValue;
+            return (double) (int) doubleValue;
         throw new ArgumentException("Invalid operand type for IntExpression. Expected double.");
     }
 }

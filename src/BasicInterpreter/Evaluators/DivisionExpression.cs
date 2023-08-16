@@ -1,4 +1,8 @@
-﻿using JesseFreeman.BasicInterpreter.Exceptions;
+﻿#region
+
+using JesseFreeman.BasicInterpreter.Exceptions;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Evaluators;
 
@@ -22,7 +26,7 @@ public class DivisionExpression : IExpression
 
         // If both operands are integers, divide them as integers but return the result as a double.
         if (operands[0] is int leftInt && operands[1] is int rightInt)
-            return (double)leftInt / rightInt;
+            return (double) leftInt / rightInt;
         return leftOperand / rightOperand;
     }
 }

@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace JesseFreeman.BasicInterpreter.IO;
+﻿namespace JesseFreeman.BasicInterpreter.IO;
 
 /// <summary>
 ///     The ConsoleOutputWriter class is an implementation of the IOutputWriter interface

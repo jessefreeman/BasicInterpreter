@@ -1,6 +1,4 @@
-﻿// Declare a namespace for command-related classes and interfaces within the JesseFreeman.BasicInterpreter project
-
-namespace JesseFreeman.BasicInterpreter.Commands;
+﻿namespace JesseFreeman.BasicInterpreter.Commands;
 
 /// <summary>
 ///     The ICommand interface defines a contract for all commands in the BasicInterpreter.

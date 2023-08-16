@@ -93,10 +93,7 @@ vardecl
 //   : PRINT exprlist?
 //   ;
 printstmt1
-   : PRINT exprWithSeparator*
-   ;
-exprWithSeparator
-   : expression separator?
+   : PRINT expression (separator expression)*
    ;
 separator
    : SEMICOLON

@@ -1,6 +1,8 @@
-﻿// Import the IInputReader interface from the JesseFreeman.BasicInterpreter.IO namespace
+﻿#region
 
 using JesseFreeman.BasicInterpreter.IO;
+
+#endregion
 
 /// <summary>
 ///     The StringInputReader class implements the IInputReader interface and provides a way to read input lines from a

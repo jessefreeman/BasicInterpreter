@@ -1,5 +1,9 @@
-﻿using JesseFreeman.BasicInterpreter.Evaluators;
+﻿#region
+
+using JesseFreeman.BasicInterpreter.Evaluators;
 using JesseFreeman.BasicInterpreter.Exceptions;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Commands;
 

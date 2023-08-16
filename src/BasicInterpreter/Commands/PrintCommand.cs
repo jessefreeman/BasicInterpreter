@@ -1,18 +1,22 @@
-﻿using System.Text;
+﻿#region
+
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using JesseFreeman.BasicInterpreter.Evaluators;
 using JesseFreeman.BasicInterpreter.IO;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Commands;
 
 public class PrintCommand : ICommand
 {
     private readonly List<BasicParser.ExpressionContext> _expressionContexts;
-    private readonly List<char> _separators;
     private readonly ExpressionEvaluator _expressionEvaluator;
+    private readonly List<char> _separators;
     private readonly IOutputWriter _writer;
 
-    public PrintCommand(List<BasicParser.ExpressionContext> expressionContexts, List<char> separators, ExpressionEvaluator expressionEvaluator, IOutputWriter writer)
+    public PrintCommand(List<BasicParser.ExpressionContext> expressionContexts, List<char> separators,
+        ExpressionEvaluator expressionEvaluator, IOutputWriter writer)
     {
         _expressionContexts = expressionContexts;
         _separators = separators;
@@ -22,7 +26,7 @@ public class PrintCommand : ICommand
 
     public void Execute()
     {
-        for (int i = 0; i < _expressionContexts.Count; i++)
+        for (var i = 0; i < _expressionContexts.Count; i++)
         {
             var expression = _expressionEvaluator.Visit(_expressionContexts[i]);
             var result = expression.Evaluate();
@@ -37,7 +41,7 @@ public class PrintCommand : ICommand
 
             if (i < _separators.Count)
             {
-                char separator = _separators[i];
+                var separator = _separators[i];
                 _writer.WriteSeparator(separator); // Use the writer's method to handle separators
             }
         }
@@ -49,7 +53,7 @@ public class PrintCommand : ICommand
     {
         if (number == Math.Truncate(number))
             // The number is a whole number, so print it without a decimal point
-            return ((int)number).ToString();
+            return ((int) number).ToString();
         return number.ToString();
     }
 }

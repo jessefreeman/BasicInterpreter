@@ -21,7 +21,7 @@ public class NegationExpression : IExpression
 
         // If the operand is an integer, negate it as an integer.
         if (operand is int)
-            return -(int)operand;
+            return -(int) operand;
         return -Convert.ToDouble(operand);
     }
 }

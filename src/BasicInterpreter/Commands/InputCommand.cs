@@ -1,5 +1,9 @@
-﻿using JesseFreeman.BasicInterpreter.Commands;
+﻿#region
+
+using JesseFreeman.BasicInterpreter.Commands;
 using JesseFreeman.BasicInterpreter.IO;
+
+#endregion
 
 namespace Jessefreeman.BasicInterpreter.Commands;
 

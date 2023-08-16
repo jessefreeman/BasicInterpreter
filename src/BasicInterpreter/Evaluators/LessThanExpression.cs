@@ -15,8 +15,8 @@ public class LessThanExpression : IExpression
     {
         if (operands.Length != 2) throw new ArgumentException("LessThanExpression requires exactly two operands.");
 
-        var left = (double)operands[0];
-        var right = (double)operands[1];
+        var left = (double) operands[0];
+        var right = (double) operands[1];
 
         return left < right;
     }

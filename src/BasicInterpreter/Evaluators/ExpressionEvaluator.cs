@@ -1,8 +1,12 @@
-﻿using System.Reflection;
+﻿#region
+
+using System.Reflection;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using JesseFreeman.BasicInterpreter.Exceptions;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Evaluators;
 
@@ -19,35 +23,35 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
 
         operations = new Dictionary<string, IExpression>
         {
-            { "+", new AdditionExpression() },
-            { "-", new SubtractionExpression() },
-            { "*", new MultiplicationExpression() },
-            { "/", new DivisionExpression() },
-            { "^", new ExponentiationExpression() },
-            { "=", new EqualExpression() },
-            { "<", new LessThanExpression() },
-            { "<=", new LessThanOrEqualExpression() },
-            { ">", new GreaterThanExpression() },
-            { ">=", new GreaterThanOrEqualExpression() },
-            { "<>", new NotEqualExpression() },
-            { "AND", new LogicalAndExpression() },
-            { "OR", new LogicalOrExpression() },
-            { "NOT", new LogicalNotExpression() }
+            {"+", new AdditionExpression()},
+            {"-", new SubtractionExpression()},
+            {"*", new MultiplicationExpression()},
+            {"/", new DivisionExpression()},
+            {"^", new ExponentiationExpression()},
+            {"=", new EqualExpression()},
+            {"<", new LessThanExpression()},
+            {"<=", new LessThanOrEqualExpression()},
+            {">", new GreaterThanExpression()},
+            {">=", new GreaterThanOrEqualExpression()},
+            {"<>", new NotEqualExpression()},
+            {"AND", new LogicalAndExpression()},
+            {"OR", new LogicalOrExpression()},
+            {"NOT", new LogicalNotExpression()}
         };
 
         unaryOperations = new Dictionary<string, IExpression>
         {
-            { "absfunc", new AbsExpression() },
-            { "atnfunc", new AtnExpression() },
-            { "cosfunc", new CosExpression() },
-            { "expfunc", new ExponentiationExpression() },
-            { "intfunc", new IntExpression() },
-            { "logfunc", new LogExpression() },
-            { "rndfunc", new RndExpression() },
-            { "sgnfunc", new SgnExpression() },
-            { "sinfunc", new SinExpression() },
-            { "sqrfunc", new SqrExpression() },
-            { "tanfunc", new TanExpression() }
+            {"absfunc", new AbsExpression()},
+            {"atnfunc", new AtnExpression()},
+            {"cosfunc", new CosExpression()},
+            {"expfunc", new ExponentiationExpression()},
+            {"intfunc", new IntExpression()},
+            {"logfunc", new LogExpression()},
+            {"rndfunc", new RndExpression()},
+            {"sgnfunc", new SgnExpression()},
+            {"sinfunc", new SinExpression()},
+            {"sqrfunc", new SqrExpression()},
+            {"tanfunc", new TanExpression()}
         };
     }
 
@@ -99,7 +103,7 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
                 {
                     var operand = Visit(unaryExpression.GetChild(0));
                     if (unaryOperations.TryGetValue(operationName, out var operation))
-                        return new LambdaExpression(operation, new[] { operand });
+                        return new LambdaExpression(operation, new[] {operand});
                 }
             }
         }
@@ -130,7 +134,7 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
             if (ops.TryGetValue(operatorSymbol, out var operation))
             {
                 var right = Visit(context.GetChild(i + 1));
-                left = new LambdaExpression(operation, new[] { left, right });
+                left = new LambdaExpression(operation, new[] {left, right});
             }
             else
             {
@@ -176,7 +180,7 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
 
             // Apply the NOT operation
             if (operations.TryGetValue("NOT", out var notOperation))
-                return new LambdaExpression(notOperation, new[] { operand });
+                return new LambdaExpression(notOperation, new[] {operand});
             throw new InterpreterException(BasicInterpreterError.UnsupportedOperation);
 
             // throw new UnsupportedOperationException("NOT operation not found in operations dictionary");
@@ -202,6 +206,6 @@ public class ExpressionEvaluator : BasicBaseVisitor<IExpression>
 
         // throw new UnsupportedOperationException($"Unhandled operator: {operatorSymbol}");
 
-        return new LambdaExpression(operation, new[] { left, right });
+        return new LambdaExpression(operation, new[] {left, right});
     }
 }

@@ -53,7 +53,7 @@ public class RndExpression : IExpression
     {
         // Initialize the seed with the current time. This makes the sequence of random numbers
         // different each time the program is run, unless a specific seed is set.
-        seed = (uint)DateTime.Now.Ticks;
+        seed = (uint) DateTime.Now.Ticks;
 
         // Generate the first random number.
         lastRandomNumber = GenerateRandomNumber();
@@ -76,12 +76,12 @@ public class RndExpression : IExpression
         {
             if (n > 0)
                 // If a maximum value is provided, multiply the random number by this value and convert the result to an integer.
-                return (int)(lastRandomNumber * n);
+                return (int) (lastRandomNumber * n);
 
             if (n < 0)
             {
                 // Use the absolute value of n as a new seed.
-                seed = (uint)Math.Abs(n);
+                seed = (uint) Math.Abs(n);
                 lastRandomNumber = GenerateRandomNumber();
                 return lastRandomNumber;
             }
@@ -112,6 +112,6 @@ public class RndExpression : IExpression
         seed = seed & 0xFFFFFFFF;
 
         // Convert the generated value to a floating-point number between 0 and 1.
-        return (double)seed / 0x100000000;
+        return (double) seed / 0x100000000;
     }
 }

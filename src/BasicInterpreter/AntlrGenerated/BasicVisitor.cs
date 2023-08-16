@@ -87,12 +87,6 @@ public interface IBasicVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitPrintstmt1([NotNull] BasicParser.Printstmt1Context context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="BasicParser.exprWithSeparator"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitExprWithSeparator([NotNull] BasicParser.ExprWithSeparatorContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="BasicParser.separator"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

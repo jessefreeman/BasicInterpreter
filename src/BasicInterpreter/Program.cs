@@ -1,24 +1,29 @@
-﻿using JesseFreeman.BasicInterpreter;
+﻿#region
+
+using JesseFreeman.BasicInterpreter;
 using JesseFreeman.BasicInterpreter.Exceptions;
 using JesseFreeman.BasicInterpreter.IO;
+
+#endregion
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        var writer = new ConsoleOutputWriter()
+        var writer = new ConsoleOutputWriter
         {
-            TabSize = 4
+            TabSize = 4,
+            AlignTabs = false
         };
-        
+
         var reader = new ConsoleInputReader();
         var interpreter = new BasicInterpreter(writer, reader);
         var exManager = new ExceptionManager(interpreter, writer);
 
-        var code = "10 FOR I = 1 TO 5\n20 PRINT \"Iteration: \"; I\n30 NEXT\n";
-
+        var code =
+            "10 PRINT 1, 2,  3";
         // interpreter.MaxIterations = 4;
-        
+
         try
         {
             interpreter.Load(code);

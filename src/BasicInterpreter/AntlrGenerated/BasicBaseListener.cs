@@ -145,18 +145,6 @@ public partial class BasicBaseListener : IBasicListener {
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitPrintstmt1([NotNull] BasicParser.Printstmt1Context context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="BasicParser.exprWithSeparator"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterExprWithSeparator([NotNull] BasicParser.ExprWithSeparatorContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="BasicParser.exprWithSeparator"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitExprWithSeparator([NotNull] BasicParser.ExprWithSeparatorContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="BasicParser.separator"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

@@ -1,6 +1,10 @@
-﻿using JesseFreeman.BasicInterpreter.AntlrGenerated;
+﻿#region
+
+using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using JesseFreeman.BasicInterpreter.Evaluators;
 using JesseFreeman.BasicInterpreter.Exceptions;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Commands;
 

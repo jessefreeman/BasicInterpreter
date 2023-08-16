@@ -2,7 +2,8 @@ namespace JesseFreeman.BasicInterpreter.IO;
 
 public abstract class BaseOutputWriter : IOutputWriter
 {
-    protected int currentLinePosition = 0;
+    public bool AlignTabs = false;
+    protected int currentLinePosition;
     public int TabSize { get; set; } = 4;
 
     public abstract void WriteLine(string line);
@@ -17,13 +18,20 @@ public abstract class BaseOutputWriter : IOutputWriter
         }
         else if (separator == ',')
         {
-            int spacesToAdd = TabSize - (currentLinePosition % TabSize);
-            if (spacesToAdd == TabSize) spacesToAdd = 0; // Fix for the off-by-one issue
-            Write(new string(' ', spacesToAdd));
-            currentLinePosition += spacesToAdd;
+            if (AlignTabs)
+            {
+                var spacesToAdd = TabSize - currentLinePosition % TabSize;
+                Write(new string(' ', spacesToAdd));
+                currentLinePosition += spacesToAdd;
+            }
+            else
+            {
+                var spacesToAdd = TabSize; // Add a fixed number of spaces for the comma separator
+                Write(new string(' ', spacesToAdd));
+                currentLinePosition += spacesToAdd;
+            }
         }
     }
-
 
     public abstract void NewLine();
 }

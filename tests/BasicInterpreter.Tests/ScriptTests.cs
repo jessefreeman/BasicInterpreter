@@ -1,15 +1,18 @@
+#region
+
 using JesseFreeman.BasicInterpreter.Exceptions;
 using JesseFreeman.BasicInterpreter.IO;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.Tests;
 
 public class ScriptTests
 {
-    private StringOutputWriter writer;
-    private StringInputReader reader;
-    private BasicInterpreter interpreter;
-    private readonly ExceptionManager exManager;
-    private const double Tolerance = 1e-10;
+
+    private readonly BasicInterpreter interpreter;
+    private readonly StringInputReader reader;
+    private readonly StringOutputWriter writer;
 
     // This constructor will be called before each test case
     public ScriptTests()
@@ -17,9 +20,8 @@ public class ScriptTests
         writer = new StringOutputWriter();
         reader = new StringInputReader(); // or any other suitable implementation for testing
         interpreter = new BasicInterpreter(writer, reader);
-        exManager = new ExceptionManager(interpreter, writer);
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
@@ -47,7 +49,7 @@ public class ScriptTests
         var exception = Record.Exception(() => interpreter.Load(script));
         Assert.Null(exception); // Ensure no exception is thrown for valid scripts
     }
-    
+
     [Theory]
     [InlineData("10 PRINT \"Hello, World!\"", "Hello, World!\n")]
     public void TestCorrectOutput(string script, string expectedOutput)
@@ -56,8 +58,6 @@ public class ScriptTests
         interpreter.Run();
         Assert.Equal(expectedOutput, writer.Output); // Ensure the output is as expected
     }
-    
-    
 
 
     [Theory]

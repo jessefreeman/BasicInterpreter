@@ -1,10 +1,16 @@
-﻿using System.Text;
+﻿#region
+
+using System.Text;
+
+#endregion
 
 namespace JesseFreeman.BasicInterpreter.IO;
 
 public class StringOutputWriter : BaseOutputWriter
 {
     private readonly StringBuilder output = new();
+
+    public string Output => output.ToString();
 
     public override void WriteLine(string line)
     {
@@ -24,13 +30,9 @@ public class StringOutputWriter : BaseOutputWriter
         currentLinePosition = 0;
     }
 
-    public string Output => output.ToString();
-
     public void Clear()
     {
         output.Clear();
         currentLinePosition = 0;
     }
 }
-
-

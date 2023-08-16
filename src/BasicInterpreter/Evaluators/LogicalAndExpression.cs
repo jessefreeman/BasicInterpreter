@@ -18,8 +18,8 @@ public class LogicalAndExpression : IExpression
         if (left is double leftDouble && right is double rightDouble)
         {
             // Convert doubles to integers for bitwise AND operation
-            var leftInt = (int)leftDouble;
-            var rightInt = (int)rightDouble;
+            var leftInt = (int) leftDouble;
+            var rightInt = (int) rightDouble;
             // Return a boolean indicating whether the result is non-zero
             return (leftInt & rightInt) != 0;
         }

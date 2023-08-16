@@ -1,20 +1,26 @@
-﻿using Antlr4.Runtime;
+﻿#region
+
+using Antlr4.Runtime;
 using JesseFreeman.BasicInterpreter.AntlrGenerated;
 using JesseFreeman.BasicInterpreter.Commands;
 using JesseFreeman.BasicInterpreter.Exceptions;
 using JesseFreeman.BasicInterpreter.IO;
 
+#endregion
+
 namespace JesseFreeman.BasicInterpreter;
 
 public class BasicInterpreter : IBasicInterpreterState
 {
-    private readonly BasicCommandVisitor visitor;
-    private readonly List<(int lineNum, ICommand command)> commands;
-    public readonly LoopContextManager LoopContextManager = new();
-    public Dictionary<int, int> PhysicalToBasicLineNumbers;
-    private readonly Dictionary<string, object> vars;
-    private readonly HashSet<int> lineNums = new();
     private const int DefaultMaxIterations = 10000;
+    private readonly List<(int lineNum, ICommand command)> commands;
+
+    private readonly Dictionary<string, ForCommand> forCommands = new();
+    private readonly HashSet<int> lineNums = new();
+    public readonly LoopContextManager LoopContextManager = new();
+    private readonly Dictionary<string, object> vars;
+    private readonly BasicCommandVisitor visitor;
+    public Dictionary<int, int> PhysicalToBasicLineNumbers;
 
     public BasicInterpreter(IOutputWriter writer, IInputReader inputReader)
     {
@@ -34,7 +40,10 @@ public class BasicInterpreter : IBasicInterpreterState
     public int CurrentCommandIndex { get; private set; }
     public int CurrentLineNumber { get; private set; }
 
-    public void SetCurrentLineNumber(int lineNum) => CurrentLineNumber = lineNum;
+    public void SetCurrentLineNumber(int lineNum)
+    {
+        CurrentLineNumber = lineNum;
+    }
 
     public void Load(string script)
     {
@@ -66,6 +75,9 @@ public class BasicInterpreter : IBasicInterpreterState
         parser.ErrorHandler = new ThrowingErrorStrategy(this);
         var tree = parser.prog();
 
+        // Print the parse tree as a string
+        Console.WriteLine(tree.ToStringTree(parser));
+
         foreach (var line in tree.line())
         {
             CurrentLineNumber = int.Parse(line.linenumber().GetText());
@@ -84,11 +96,8 @@ public class BasicInterpreter : IBasicInterpreterState
         // Check for unmatched FOR and NEXT commands
         var forStack = new Stack<(int lineNum, string variableName)>();
         foreach (var command in commands)
-        {
             if (command.command is CompositeCommand compositeCommand)
-            {
                 foreach (var innerCommand in compositeCommand.Commands)
-                {
                     if (innerCommand is ForCommand forCommand)
                     {
                         forStack.Push((command.lineNum, forCommand.variableName));
@@ -97,37 +106,28 @@ public class BasicInterpreter : IBasicInterpreterState
                     {
                         // Check that the NextCommand has the same number of variables as the corresponding FOR commands
                         if (nextCommand.VariableNames.Count > forStack.Count)
-                        {
                             throw new InterpreterException(BasicInterpreterError.NextWithoutFor);
-                        }
 
                         // Pop the stack once for each variable in the NextCommand
-                        for (int i = 0; i < nextCommand.VariableNames.Count; i++)
+                        for (var i = 0; i < nextCommand.VariableNames.Count; i++)
                         {
                             if (forStack.Count == 0)
-                            {
                                 throw new InterpreterException(BasicInterpreterError.NextWithoutFor);
-                            }
                             forStack.Pop();
                         }
                     }
-                }
-            }
-        }
 
-// Check for unmatched FOR commands
+        // Check for unmatched FOR commands
         if (forStack.Count > 0)
         {
             // Get the line number of the unmatched FOR command
             var unmatchedForLineNumber = forStack.Pop().lineNum;
             throw new InterpreterException(BasicInterpreterError.ForWithoutNext)
             {
-                Data = { { "line", unmatchedForLineNumber } }
+                Data = {{"line", unmatchedForLineNumber}}
             };
         }
-
     }
-
 
 
     private int ExtractBasicLineNumber(string line)
@@ -152,15 +152,15 @@ public class BasicInterpreter : IBasicInterpreterState
         {
             CurrentLineNumber = commands[CurrentCommandIndex].lineNum;
             iterationCount++;
-            if (iterationCount > MaxIterations)
-            {
-                throw new InterpreterException(BasicInterpreterError.MaxLoopsExceeded);
-            }
+            if (iterationCount > MaxIterations) throw new InterpreterException(BasicInterpreterError.MaxLoopsExceeded);
 
             var (_, command) = commands[CurrentCommandIndex];
             CurrentPosition = CurrentCommandIndex;
 
-            try { command.Execute(); }
+            try
+            {
+                command.Execute();
+            }
             catch (GotoCommandException gotoEx)
             {
                 if (iterationCount >= MaxIterations)
@@ -168,7 +168,11 @@ public class BasicInterpreter : IBasicInterpreterState
                 JumpToLine(gotoEx.TargetLineNumber);
                 continue;
             }
-            catch (SkipNextCommandException) { CurrentCommandIndex += 2; continue; }
+            catch (SkipNextCommandException)
+            {
+                CurrentCommandIndex += 2;
+                continue;
+            }
 
             if (HasEnded) break;
             CurrentCommandIndex++;
@@ -199,8 +203,6 @@ public class BasicInterpreter : IBasicInterpreterState
     {
         CurrentCommandIndex = index;
     }
-    
-    private readonly Dictionary<string, ForCommand> forCommands = new();
 
     public void RegisterForCommand(string variableName, ForCommand forCommand)
     {
@@ -212,5 +214,4 @@ public class BasicInterpreter : IBasicInterpreterState
         forCommands.TryGetValue(variableName, out var forCommand);
         return forCommand;
     }
-
 }
