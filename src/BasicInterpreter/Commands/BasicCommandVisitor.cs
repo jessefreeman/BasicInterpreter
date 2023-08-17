@@ -71,27 +71,6 @@ public class BasicCommandVisitor : BasicBaseVisitor<ICommand>
         return new CompositeCommand(commands);
     }
 
-    // public override ICommand VisitPrintstmt1(BasicParser.Printstmt1Context context)
-    // {
-    //     var expressionContexts = new List<BasicParser.ExpressionContext>();
-    //     var separators = new List<char>();
-    //
-    //     // Iterate through the exprWithSeparator contexts
-    //     foreach (var exprWithSeparatorContext in context.exprWithSeparator())
-    //     {
-    //         expressionContexts.Add(exprWithSeparatorContext.expression());
-    //
-    //         // Check if there is a separator
-    //         var separatorContext = exprWithSeparatorContext.separator();
-    //         if (separatorContext != null)
-    //         {
-    //             var separatorChar = separatorContext.GetText() == ";" ? ';' : ',';
-    //             separators.Add(separatorChar);
-    //         }
-    //     }
-    //
-    //     return new PrintCommand(expressionContexts, separators, expressionEvaluator, writer);
-    // }
     public override ICommand VisitPrintstmt1(BasicParser.Printstmt1Context context)
     {
         var expressions = context.expression().Select(expr => expr).ToList();

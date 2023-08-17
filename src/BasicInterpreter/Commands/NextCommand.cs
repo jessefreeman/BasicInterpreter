@@ -32,6 +32,10 @@ public class NextCommand : ICommand
 
             var currentValue = interpreter.GetVariable(loopContext.VariableName);
             currentValue += loopContext.StepValue;
+
+            // Log the values here
+            Console.WriteLine($"NEXT Command: VariableName={variableName}, CurrentValue={currentValue}, EndValue={loopContext.EndValue}, CommandIndex={loopContext.CommandIndex}");
+
             interpreter.SetVariable(loopContext.VariableName, currentValue);
 
             if (loopContext.StepValue > 0 && currentValue <= loopContext.EndValue ||
@@ -43,9 +47,10 @@ public class NextCommand : ICommand
                     loopContext.ShouldSkip);
 
                 interpreter.LoopContextManager.Push(variableName, updatedLoopContext);
-                interpreter.JumpToCommandIndex(loopContext.CommandIndex);
+                interpreter.JumpToCommandIndex(loopContext.CommandIndex); // Jump to the command after the FOR
                 return; // Return after processing the innermost loop
             }
         }
     }
+
 }

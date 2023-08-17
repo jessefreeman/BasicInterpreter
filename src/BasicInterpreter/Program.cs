@@ -20,8 +20,13 @@ internal class Program
         var interpreter = new BasicInterpreter(writer, reader);
         var exManager = new ExceptionManager(interpreter, writer);
 
-        var code =
-            "10 PRINT 1, 2,  3";
+        // Use this for debugging
+        Logger.OutputWriter = writer;
+        
+        // var code = "10 FOR I = 1 TO 10\n20 IF I = 5 THEN GOTO 50\n30 PRINT \"Iteration: \"; I\n40 NEXT I\n50 PRINT \"Loop exited\"\n";
+
+        var code = "10 FOR I = 1 TO 5\n20 FOR J = 1 TO 3\n30 PRINT I, J\n40 NEXT J, I\n";
+        
         // interpreter.MaxIterations = 4;
 
         try

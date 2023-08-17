@@ -1,4 +1,6 @@
-﻿namespace JesseFreeman.BasicInterpreter.Commands;
+﻿using System.Text;
+
+namespace JesseFreeman.BasicInterpreter.Commands;
 
 public class CompositeCommand : ICommand
 {
@@ -16,4 +18,22 @@ public class CompositeCommand : ICommand
     {
         foreach (var command in commands) command.Execute();
     }
+
+    public override string ToString()
+    {
+        StringBuilder innerCommandsDetails = new StringBuilder();
+        foreach (var innerCommand in Commands)
+        {
+            innerCommandsDetails.Append($"Inner Command Type: {innerCommand.GetType().Name}, ");
+        }
+
+        // Remove the trailing comma and space
+        if (innerCommandsDetails.Length > 2)
+        {
+            innerCommandsDetails.Length -= 2;
+        }
+
+        return $"CompositeCommand with Inner Commands: {innerCommandsDetails.ToString()}";
+    }
+
 }

@@ -42,10 +42,7 @@ public class IfCommand : ICommand
                 // If we don't have a command, but we have a line number, throw a GotoCommandException
                 throw new GotoCommandException(_thenLineNumber);
         }
-        else
-        {
-            // If the condition is false, throw a SkipNextCommandException to skip the next command
-            throw new SkipNextCommandException();
-        }
+        // No else block needed; simply continue executing the next command if the condition is false
     }
+
 }

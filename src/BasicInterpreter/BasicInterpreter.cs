@@ -76,8 +76,8 @@ public class BasicInterpreter : IBasicInterpreterState
         var tree = parser.prog();
 
         // Print the parse tree as a string
-        Console.WriteLine(tree.ToStringTree(parser));
-
+        Logger.Log($"Preprocessing input completed.\n{tree.ToStringTree(parser)}" , LogTag.ParseTree);
+        
         foreach (var line in tree.line())
         {
             CurrentLineNumber = int.Parse(line.linenumber().GetText());
@@ -127,6 +127,11 @@ public class BasicInterpreter : IBasicInterpreterState
                 Data = {{"line", unmatchedForLineNumber}}
             };
         }
+        
+        for (int i = 0; i < commands.Count; i++)
+        {
+            Logger.Log($"Command Index: {i}, Line: {commands[i].lineNum}, Execute: {commands[i].command.ToString()}", LogTag.CommandIndex);        
+        }
     }
 
 
@@ -157,6 +162,9 @@ public class BasicInterpreter : IBasicInterpreterState
             var (_, command) = commands[CurrentCommandIndex];
             CurrentPosition = CurrentCommandIndex;
 
+            // Log the execution of the command
+            Console.WriteLine($"Executing Command at Index: {CurrentCommandIndex}, Line Number: {CurrentLineNumber}, Command Type: {command.GetType().Name}");
+
             try
             {
                 command.Execute();
@@ -166,11 +174,6 @@ public class BasicInterpreter : IBasicInterpreterState
                 if (iterationCount >= MaxIterations)
                     throw new InterpreterException(BasicInterpreterError.MaxLoopsExceeded);
                 JumpToLine(gotoEx.TargetLineNumber);
-                continue;
-            }
-            catch (SkipNextCommandException)
-            {
-                CurrentCommandIndex += 2;
                 continue;
             }
 
@@ -201,6 +204,7 @@ public class BasicInterpreter : IBasicInterpreterState
 
     public void JumpToCommandIndex(int index)
     {
+        Console.WriteLine($"Jumping to Command Index: {index}");
         CurrentCommandIndex = index;
     }
 

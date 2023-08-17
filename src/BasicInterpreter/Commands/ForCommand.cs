@@ -33,6 +33,9 @@ public class ForCommand : ICommand
         var endValue = (double) endExpression.Evaluate();
         var stepValue = stepExpression != null ? (double) stepExpression.Evaluate() : 1;
 
+        // Log the values here
+        Console.WriteLine($"FOR Command: StartValue={startValue}, EndValue={endValue}, StepValue={stepValue}, CommandIndex={interpreter.CurrentCommandIndex + 1}");
+
         if (stepValue == 0) throw new InterpreterException(BasicInterpreterError.StepValueZero);
 
         interpreter.SetVariable(variableName, startValue);
@@ -40,8 +43,16 @@ public class ForCommand : ICommand
         var shouldSkip = stepValue > 0 && startValue > endValue || stepValue < 0 && startValue < endValue;
 
         var loopContext = new LoopContext(variableName, endValue, stepValue,
-            interpreter.CurrentCommandIndex, interpreter.CurrentLineNumber, interpreter.CurrentPosition, shouldSkip);
+            interpreter.CurrentCommandIndex, // Store the current index, not +1
+            interpreter.CurrentLineNumber, interpreter.CurrentPosition, shouldSkip);
 
         interpreter.LoopContextManager.Push(variableName, loopContext); // Push with variable name
+
+        // If the loop should be skipped, jump to the next command after the loop
+        if (shouldSkip)
+        {
+            interpreter.JumpToCommandIndex(interpreter.CurrentCommandIndex + 1);
+        }
     }
+
 }
